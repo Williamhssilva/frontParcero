@@ -2,68 +2,292 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    padding-bottom: 80px; /* Adicione espaço para o menu do footer */
 }
 
-.property-image img {
+.property-header {
+    margin-bottom: 20px;
+}
+
+.property-header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.property-header p {
+    font-size: 16px;
+    color: #666;
+}
+
+.property-gallery {
+    margin-bottom: 30px;
+}
+
+.swiper-container {
     width: 100%;
-    height: auto;
-    border-radius: 8px;
+    height: 400px;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .property-info {
-    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.property-main-info {
+    width: 100%;
+    margin-bottom: 20px;
 }
 
 .price {
     font-size: 24px;
     font-weight: bold;
     color: #4CAF50;
+    margin-bottom: 10px;
 }
 
-.address {
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.feature {
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.feature i {
+    margin-right: 5px;
+}
+
+.property-description, .property-details {
+    flex: 1;
+    min-width: 300px;
+}
+
+.property-description h2, .property-details h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.property-details-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.property-details-list li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.property-details-list li i {
+    margin-right: 10px;
     font-size: 18px;
-    color: #666;
-}
-
-.details {
-    margin: 10px 0;
-    font-size: 16px;
-}
-
-.description {
-    line-height: 1.6;
+    color: #4CAF50;
 }
 
 .property-actions {
+    width: 100%;
+    display: flex;
+    gap: 15px;
     margin-top: 20px;
 }
 
-.property-actions button {
+.btn {
     padding: 10px 20px;
-    margin-right: 10px;
-    background-color: #4CAF50;
-    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-.property-actions button:hover {
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
     background-color: #45a049;
 }
 
-.property-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
+.btn-secondary {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .property-info {
+        flex-direction: column;
+    }
+
+    .property-description, .property-details {
+        width: 100%;
+    }
+
+    .property-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .swiper-container {
+        height: 300px;
+    }
+
+    .gallery-thumbs {
+        height: 60px;
+    }
+
+    .properties-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .property-header h1 {
+        font-size: 24px;
+    }
+
+    .price {
+        font-size: 20px;
+    }
+
+    .features {
+        flex-direction: column;
+    }
+
+    .feature {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .swiper-container {
+        height: 250px;
+    }
+}
+
+.gallery-top {
+    height: 400px;
+    width: 100%;
+}
+
+.gallery-thumbs {
+    height: 100px;
+    box-sizing: border-box;
+    padding: 10px 0;
+}
+
+.gallery-thumbs .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+}
+
+.gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+}
+
+/* Adicione estes estilos no final do arquivo */
+.similar-properties {
+    margin-top: 40px;
+}
+
+.similar-properties h2 {
+    font-size: 24px;
     margin-bottom: 20px;
 }
 
-.property-image {
-    width: 100%;
-    height: 200px;
-    background-size: cover;
-    background-position: center;
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
 }
 
-/* Adicione mais estilos conforme necessário */
+.property-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+}
+
+.property-card-image {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.property-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.property-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.property-card:hover .property-card-image img {
+    transform: scale(1.1);
+}
+
+.property-card:hover .property-card-overlay {
+    opacity: 1;
+}
+
+.property-card-info {
+    padding: 15px;
+}
+
+.property-card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.property-card-price {
+    font-size: 16px;
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.property-card-details {
+    font-size: 14px;
+    color: #666;
+}

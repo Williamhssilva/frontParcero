@@ -1,7 +1,8 @@
 import { getCurrentUser } from './auth.js';
+import { logout } from './auth.js';
 
-function createMenuItem(href, iconClass, text) {
-    return `<a href="${href}"><i class="${iconClass}"></i>${text}</a>`;
+function createMenuItem(href, iconClass, text, id = '') {
+    return `<a href="${href}" ${id ? `id="${id}"` : ''}><i class="${iconClass}"></i>${text}</a>`;
 }
 
 export function renderMenu() {
@@ -30,12 +31,12 @@ export function renderMenu() {
         }
 
         menuItems.push(createMenuItem('#', 'far fa-user', 'Perfil'));
-        menuItems.push(createMenuItem('#', 'fas fa-sign-out-alt', 'Sair'));
+        menuItems.push(createMenuItem('#', 'fas fa-sign-out-alt', 'Sair', 'logout-button'));
     } else {
         menuItems.push(createMenuItem('login.html', 'fas fa-sign-in-alt', 'Login'));
     }
 
-    menuContainer.innerHTML = menuItems.join('');
+    menuContainer.innerHTML = menuItems.map(item => `<div class="menu-item">${item}</div>`).join('');
 
     // Adicionar classe 'active' ao item de menu atual
     const currentPage = window.location.pathname.split('/').pop();
@@ -44,15 +45,35 @@ export function renderMenu() {
         currentMenuItem.classList.add('active');
     }
 
-    // Adicionar event listener para o botão de logout
-    const logoutButton = menuContainer.querySelector('a:last-child');
-    if (logoutButton && user) {
-        logoutButton.id = 'logout-button';
+    // Adicionar event listeners
+    addEventListeners();
+}
+
+function addEventListeners() {
+    // Event listener para o botão de logout
+    const logoutButton = document.getElementById('logout-button');
+    if (logoutButton) {
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
-            // Chame a função de logout aqui
-            // Você pode importar a função de logout do arquivo auth.js
-            // ou usar um evento personalizado para acionar o logout
+            logout();
         });
     }
+}
+
+// Adicionar listener para redimensionamento da janela
+window.addEventListener('resize', debounce(() => {
+    renderMenu();
+}, 250));
+
+// Função de debounce para evitar chamadas excessivas durante o redimensionamento
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }

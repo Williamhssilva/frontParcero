@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/property-details.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
 <body>
     <header>
@@ -18,14 +19,54 @@
         </div>
     </header>
 
-    <main id="property-details">
-        <!-- O conteúdo será preenchido dinamicamente via JavaScript -->
+    <main id="property-details" class="container">
+        <div class="property-header">
+            <h1 id="property-title"></h1>
+            <p id="property-address"></p>
+        </div>
+        <div class="property-gallery">
+            <div class="swiper-container gallery-top">
+                <div class="swiper-wrapper">
+                    <!-- As imagens serão inseridas aqui dinamicamente -->
+                </div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+            <div class="swiper-container gallery-thumbs">
+                <div class="swiper-wrapper">
+                    <!-- As miniaturas serão inseridas aqui dinamicamente -->
+                </div>
+            </div>
+        </div>
+        <div class="property-info">
+            <div class="property-main-info">
+                <div id="property-price" class="price"></div>
+                <div id="property-features" class="features"></div>
+            </div>
+            <div class="property-description">
+                <h2>Descrição</h2>
+                <p id="property-description-text"></p>
+            </div>
+            <div class="property-details">
+                <h2>Detalhes</h2>
+                <ul id="property-details-list"></ul>
+            </div>
+            <div class="property-actions">
+                <button id="request-visit-btn" class="btn btn-primary">Solicitar Visita</button>
+                <button id="favorite-btn" class="btn btn-secondary">Favoritar</button>
+            </div>
+            <div class="similar-properties">
+                <h2>Propriedades Similares</h2>
+                <div id="similar-properties-list" class="properties-grid"></div>
+            </div>
+        </div>
     </main>
 
     <nav class="bottom-menu">
         <!-- O menu será preenchido dinamicamente pelo JavaScript -->
     </nav>
 
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script type="module" src="js/config.js"></script>
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/menu.js"></script>

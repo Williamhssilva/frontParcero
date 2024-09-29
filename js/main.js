@@ -19,9 +19,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Verifica se estamos na página de detalhes da propriedade
-    const isPropertyDetailsPage = document.getElementById('property-details') !== null;
-    if (isPropertyDetailsPage) {
-        initPropertyDetails();
+    if (window.location.pathname.includes('property-details.html')) {
+        // Importa e inicializa os detalhes da propriedade apenas se estivermos na página correta
+        import('./property-details.js').then(module => {
+            if (typeof module.initPropertyDetails === 'function') {
+                module.initPropertyDetails();
+            }
+        });
     }
 
     // Adicione outras verificações específicas de página aqui, se necessário

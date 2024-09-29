@@ -63,14 +63,14 @@ function displayLeads(leads) {
             leads.forEach(lead => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${lead.name}</td>
-                    <td>${lead.email}</td>
-                    <td>${lead.phone}</td>
-                    <td>${lead.interest}</td>
-                    <td>${lead.status}</td>
-                    <td>
-                        <button class="edit-lead" data-id="${lead._id}">Editar</button>
-                        <button class="delete-lead" data-id="${lead._id}">Excluir</button>
+                    <td data-label="Nome">${lead.name}</td>
+                    <td data-label="Email">${lead.email}</td>
+                    <td data-label="Telefone">${lead.phone}</td>
+                    <td data-label="Interesse">${lead.interest}</td>
+                    <td data-label="Status">${lead.status}</td>
+                    <td data-label="Ações">
+                        <button class="btn btn-edit edit-lead" data-id="${lead._id}">Editar</button>
+                        <button class="btn btn-delete delete-lead" data-id="${lead._id}">Excluir</button>
                     </td>
                 `;
                 tableBody.appendChild(row);

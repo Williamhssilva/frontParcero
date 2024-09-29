@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Administrador</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="css/admin-dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dashboard do Administrador</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="container">
+                <div id="loading-indicator" style="display: none;">Carregando dados do dashboard...</div>
+
+                <section class="dashboard-summary">
+                    <div class="dashboard-card" id="total-properties">
+                        <h3>Total de Propriedades</h3>
+                        <p class="dashboard-number">0</p>
+                    </div>
+                    <div class="dashboard-card" id="total-leads">
+                        <h3>Total de Leads</h3>
+                        <p class="dashboard-number">0</p>
+                    </div>
+                    <div class="dashboard-card" id="total-agents">
+                        <h3>Total de Corretores</h3>
+                        <p class="dashboard-number">0</p>
+                    </div>
+                    <div class="dashboard-card" id="pending-approvals">
+                        <h3>Aprovações Pendentes</h3>
+                        <p class="dashboard-number">0</p>
+                    </div>
+                    <div id="pending-agents-container"></div>
+                </section>
+                <section class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>Propriedades por Tipo</h3>
+                        <canvas id="properties-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Leads por Status</h3>
+                        <canvas id="leads-chart"></canvas>
+                    </div>
+                </section>
+
+                <section class="recent-activities">
+                    <h3>Atividades Recentes</h3>
+                    <ul id="recent-activities-list"></ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-menu">
+        <!-- O menu será preenchido dinamicamente pelo JavaScript -->
+    </nav>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/admin-dashboard.js"></script>
+</body>
+</html>

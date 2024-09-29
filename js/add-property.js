@@ -2,15 +2,29 @@ import { API_BASE_URL } from './config.js';
 import { getCurrentUser, checkPermission } from './auth.js';
 import { renderMenu } from './menu.js';
 
+console.log('add-property.js carregado');
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired');
     checkPermission(['corretor']);
     setupForm();
     setupImagePreview();
+    renderMenu();
+    console.log('Token armazenado:', localStorage.getItem('token'));
 });
 
 function setupForm() {
+    console.log('Configurando formulário');
     const form = document.getElementById('add-property-form');
-    form.addEventListener('submit', handleSubmit);
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            console.log('Formulário submetido');
+            event.preventDefault();
+            handleSubmit(event);
+        });
+    } else {
+        console.error('Formulário não encontrado');
+    }
 }
 
 function setupImagePreview() {
@@ -36,6 +50,7 @@ function setupImagePreview() {
 }
 
 async function handleSubmit(event) {
+    console.log('Form submission started');
     event.preventDefault();
     const form = event.target;
     
@@ -47,6 +62,7 @@ async function handleSubmit(event) {
 
     try {
         showLoading();
+        console.log('Sending request to server');
         const response = await fetch(`${API_BASE_URL}/api/properties`, {
             method: 'POST',
             headers: {
@@ -55,23 +71,29 @@ async function handleSubmit(event) {
             body: formData
         });
 
+        console.log('Response received:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
         if (!response.ok) {
-            throw new Error('Falha ao adicionar propriedade');
+            throw new Error(data.message || 'Falha ao adicionar propriedade');
         }
 
-        showSuccess('Propriedade adicionada com sucesso!');
+        showToast('Propriedade adicionada com sucesso!', 'success');
+        console.log('Propriedade criada:', data.data);
         setTimeout(() => {
             window.location.href = 'manage-properties.html';
         }, 2000);
     } catch (error) {
         console.error('Erro ao adicionar propriedade:', error);
-        showError('Erro ao adicionar propriedade. Por favor, tente novamente.');
+        showToast(error.message || 'Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
     } finally {
         hideLoading();
     }
 }
 
 function validateForm(form) {
+    console.log('Validating form');
     const requiredFields = form.querySelectorAll('[required]');
     let isValid = true;
 
@@ -85,24 +107,41 @@ function validateForm(form) {
     });
 
     if (!isValid) {
-        showError('Por favor, preencha todos os campos obrigatórios.');
+        showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
     }
 
+    console.log('Form validation result:', isValid);
     return isValid;
 }
 
 function showLoading() {
-    // Implementar lógica para mostrar indicador de carregamento
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.id = 'loading-indicator';
+    loadingIndicator.innerHTML = '<div class="spinner"></div>';
+    document.body.appendChild(loadingIndicator);
 }
 
 function hideLoading() {
-    // Implementar lógica para esconder indicador de carregamento
+    const loadingIndicator = document.getElementById('loading-indicator');
+    if (loadingIndicator) {
+        loadingIndicator.remove();
+    }
 }
 
-function showSuccess(message) {
-    alert(message); // Substituir por uma solução mais elegante, como um toast
-}
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
 
-function showError(message) {
-    alert(message); // Substituir por uma solução mais elegante, como um toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
 }

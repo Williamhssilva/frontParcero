@@ -87,3 +87,206 @@
 .btn-danger:hover {
     background-color: #d32f2f;
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.property-images-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+}
+
+.property-images-carousel img {
+    flex: none;
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    scroll-snap-align: start;
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.property-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.property-details, .property-description {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.property-details p, .property-description p {
+    margin: 10px 0;
+}
+
+#edit-property-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+#edit-property-btn:hover {
+    background-color: #45a049;
+}
+
+/* Adicione estes estilos ao final do arquivo */
+#property-edit-mode form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#property-edit-mode input,
+#property-edit-mode textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#edit-images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#edit-images-container img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.image-delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.property-images {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.property-images img {
+    width: 32%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.property-gallery {
+    margin-bottom: 20px;
+    overflow: hidden;  /* Esconde qualquer conteúdo que ultrapasse os limites */
+}
+
+.gallery-top {
+    height: 300px;
+    width: 100%;
+}
+
+.gallery-top .swiper-slide {
+    opacity: 0;  /* Torna todos os slides invisíveis por padrão */
+    transition: opacity 0.3s ease;  /* Adiciona uma transição suave */
+}
+
+.gallery-top .swiper-slide-active {
+    opacity: 1;  /* Torna apenas o slide ativo visível */
+}
+
+.gallery-thumbs {
+    height: 100px;
+    box-sizing: border-box;
+    padding: 10px 0;
+}
+
+.gallery-thumbs .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Ajusta o tamanho da modal para garantir que caiba na tela */
+#property-details-modal .modal-content {
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}

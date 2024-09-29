@@ -111,7 +111,7 @@ function updatePagination(currentPage, totalPages, pageChangeCallback) {
 
 async function loadFeaturedProperties(page = 1) {
     try {
-        console.log('loadFeaturedProperties foi chamada');
+        // Remova a linha de console.log aqui
         const response = await fetch(`${API_BASE_URL}/api/properties?page=${page}&limit=12`);
         
         if (!response.ok) {
@@ -133,12 +133,11 @@ async function loadFeaturedProperties(page = 1) {
 }
 
 function setupFilters() {
-    const applyFiltersButton = document.getElementById('apply-filters');
-    if (applyFiltersButton) {
-        applyFiltersButton.addEventListener('click', () => searchProperties(1));
-    } else {
-        console.log('Botão de filtros não encontrado na página atual');
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', searchProperties);
     }
+    // Remova o else com o console.error
 }
 
 function createPaginationButton(text, onClick, isActive = false) {
@@ -152,7 +151,6 @@ function createPaginationButton(text, onClick, isActive = false) {
 }
 
 function displayProperties(properties) {
-    console.log('Propriedades recebidas para exibição:', properties);
     const propertyGrid = document.getElementById('property-grid');
     if (!propertyGrid) {
         console.log('Elemento property-grid não encontrado na página atual');

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/manage-properties.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
 </head>
 <body>
     <header>
@@ -35,6 +36,39 @@
         <!-- O menu será preenchido dinamicamente pelo JavaScript -->
     </nav>
 
+    <div id="property-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="property-view-mode">
+                <div class="property-header">
+                    <h2 id="modal-property-title"></h2>
+                    <p id="modal-property-price" class="property-price"></p>
+                </div>
+                <div class="property-gallery">
+                    <div id="modal-property-images" class="property-images-carousel">
+                        <!-- Imagens serão inseridas aqui dinamicamente -->
+                    </div>
+                    <div class="image-overlay">1/5</div>
+                </div>
+                <div class="property-info">
+                    <div class="property-details">
+                        <p id="modal-property-address"></p>
+                        <p id="modal-property-details"></p>
+                    </div>
+                    <div class="property-description">
+                        <h3>Descrição</h3>
+                        <p id="modal-property-description"></p>
+                    </div>
+                </div>
+                <button id="edit-property-btn" class="btn btn-primary">Editar Propriedade</button>
+            </div>
+            <div id="property-edit-mode" style="display: none;">
+                <!-- O conteúdo do modo de edição permanece o mesmo -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/config.js"></script>

@@ -6,7 +6,6 @@ function createMenuItem(href, iconClass, text, id = '') {
 }
 
 export function renderMenu() {
-    console.log('renderMenu foi chamada');
     const user = getCurrentUser();
     const menuContainer = document.querySelector('.bottom-menu');
     

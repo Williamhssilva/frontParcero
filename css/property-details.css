@@ -20,16 +20,32 @@
     color: #666;
 }
 
-.property-gallery {
+#property-details .property-gallery {
     margin-bottom: 30px;
 }
 
-.swiper-container {
-    width: 100%;
+#property-details .gallery-top {
     height: 400px;
+    width: 100%;
 }
 
-.swiper-slide img {
+#property-details .gallery-thumbs {
+    height: 100px;
+    box-sizing: border-box;
+    padding: 10px 0;
+}
+
+#property-details .gallery-thumbs .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+}
+
+#property-details .gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+}
+
+#property-details .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -291,3 +307,61 @@
     font-size: 14px;
     color: #666;
 }
+
+.property-gallery {
+    margin-bottom: 20px;
+}
+
+.gallery-top {
+    height: 400px;
+    width: 100%;
+}
+
+.gallery-thumbs {
+    height: 100px;
+    box-sizing: border-box;
+    padding: 10px 0;
+}
+
+.gallery-thumbs .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+}
+
+.gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#similar-properties {
+    margin-top: 40px;
+}
+
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.property-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+}
+
+.property-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Adicione mais estilos conforme necessário */

@@ -18,11 +18,17 @@
 
     <main class="manage-properties container">
         <h1>Gerenciar Propriedades</h1>
+        <div class="search-area">
+            <div class="search-box">
+                <input type="text" id="property-search" placeholder="Buscar imóvel por título...">
+            </div>
+        </div>
         <div class="manage-actions">
-            <a href="agent-dashboard.html" class="btn btn-secondary"><i class="fas fa-chart-line"></i> Voltar ao Dashboard</a>
+            <!-- botões de ação -->
             <a href="add-property.html" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Nova Propriedade</a>
         </div>
         <div id="properties-list" class="properties-grid"></div>
+        <div id="pagination" class="pagination"></div>
     </main>
 
     <nav class="bottom-menu">

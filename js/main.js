@@ -4,7 +4,7 @@ import { getCurrentUser, logout } from './auth.js';
 import { initPropertyDetails } from './property-details.js';
 
 let currentPage = 1;
-const limit = 10; // Número de itens por página
+const limit = 12; // Número de itens por página
 
 // main.js
 document.addEventListener('DOMContentLoaded', function() {
@@ -48,7 +48,7 @@ async function searchProperties(page = 1) {
 
     const queryParams = new URLSearchParams({
         page: page,
-        limit: 10
+        limit: 12
     });
     if (location) queryParams.append('location', location);
     if (minPrice) queryParams.append('minPrice', minPrice);
@@ -112,7 +112,7 @@ function updatePagination(currentPage, totalPages, pageChangeCallback) {
 async function loadFeaturedProperties(page = 1) {
     try {
         console.log('loadFeaturedProperties foi chamada');
-        const response = await fetch(`${API_BASE_URL}/api/properties?page=${page}&limit=10`);
+        const response = await fetch(`${API_BASE_URL}/api/properties?page=${page}&limit=12`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

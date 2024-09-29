@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Corretor | Parcero Imóveis</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/agent-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Parcero Imóveis</div>
+            <div id="user-actions"></div>
+        </div>
+    </header>
+
+    <main class="agent-dashboard container">
+        <h1>Dashboard do Corretor</h1>
+        
+        <!-- Adicione uma seção para os botões de ação -->
+        <div class="dashboard-actions">
+            <!-- Mantenha os botões existentes e adicione o novo botão de Gerenciar Leads -->
+            <a href="add-property.html" class="btn btn-primary">Adicionar Imóvel</a>
+            <a href="manage-properties.html" class="btn btn-secondary">Gerenciar Imóveis</a>
+            <a href="manage-leads.html" class="btn btn-primary">Gerenciar Leads</a>
+            <!-- Adicione outros botões existentes aqui, se houver -->
+        </div>
+        
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <i class="fas fa-home"></i>
+                <h3>Total de Propriedades</h3>
+                <p id="total-properties">Carregando...</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h3>Propriedades Ativas</h3>
+                <p id="active-properties">Carregando...</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-dollar-sign"></i>
+                <h3>Propriedades Vendidas</h3>
+                <p id="sold-properties">Carregando...</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-eye"></i>
+                <h3>Total de Visualizações</h3>
+                <p id="total-views">Carregando...</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Preço Médio</h3>
+                <p id="average-price">Carregando...</p>
+            </div>
+        </div>
+        <div class="dashboard-charts">
+            <div class="chart-container">
+                <h3>Propriedades por Tipo</h3>
+                <canvas id="properties-by-type-chart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Tendência de Preços (Últimos 6 meses)</h3>
+                <canvas id="price-trend-chart"></canvas>
+            </div>
+        </div>
+        <div class="recent-properties">
+            <h2>Propriedades Recentes</h2>
+            <table id="recent-properties-table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Preço</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-properties-list">
+                    <!-- Será preenchido dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <nav class="bottom-menu">
+        <!-- O menu será preenchido dinamicamente pelo JavaScript -->
+    </nav>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcero Imóveis</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Parcero Imóveis</div>
+            <div id="user-actions"></div>
+        </div>
+    </header>
+
+    <main>
+        <section class="search-area">
+            <div class="container">
+                <div class="search-box">
+                    <input type="text" id="location" placeholder="Localização">
+                    <input type="number" id="minPrice" placeholder="Preço mínimo">
+                    <input type="number" id="maxPrice" placeholder="Preço máximo">
+                    <select id="bedrooms">
+                        <option value="">Quartos</option>
+                        <option value="1">1+</option>
+                        <option value="2">2+</option>
+                        <option value="3">3+</option>
+                        <option value="4">4+</option>
+                    </select>
+                    <input type="number" id="minArea" placeholder="Área mínima (m²)">
+                    <button id="apply-filters">Buscar</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-properties">
+            <div class="container">
+                <h2>Imóveis em Destaque</h2>
+                <div id="property-grid" class="property-grid">
+                    <!-- Propriedades serão inseridas aqui dinamicamente -->
+                </div>
+                <div id="pagination" class="pagination">
+                    <!-- Controles de paginação serão inseridos aqui -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-menu">
+        <!-- O menu será preenchido dinamicamente pelo JavaScript -->
+    </nav>
+
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userActionsElement = document.getElementById('user-actions');
+            
+            if (user && user.role === 'administrador' && userActionsElement) {
+                let adminApprovalLink = document.getElementById('admin-approval-link');
+                
+                if (!adminApprovalLink) {
+                    adminApprovalLink = document.createElement('a');
+                    adminApprovalLink.id = 'admin-approval-link';
+                    adminApprovalLink.href = 'admin-approval.html';
+                    adminApprovalLink.textContent = 'Aprovar Corretores';
+                    userActionsElement.appendChild(adminApprovalLink);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

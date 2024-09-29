@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Propriedades | Parcero Imóveis</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/manage-properties.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Parcero Imóveis</div>
+            <div id="user-actions"></div>
+        </div>
+    </header>
+
+    <main class="manage-properties container">
+        <h1>Gerenciar Propriedades</h1>
+        <div class="manage-actions">
+            <a href="agent-dashboard.html" class="btn btn-secondary"><i class="fas fa-chart-line"></i> Voltar ao Dashboard</a>
+            <a href="add-property.html" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Nova Propriedade</a>
+        </div>
+        <div id="properties-list" class="properties-grid"></div>
+    </main>
+
+    <nav class="bottom-menu">
+        <!-- O menu será preenchido dinamicamente pelo JavaScript -->
+    </nav>
+
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/manage-properties.js"></script>
+</body>
+</html>

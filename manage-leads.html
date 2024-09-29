@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Leads | Parcero Imóveis</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/manage-leads.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">Parcero Imóveis</div>
+            <div id="user-actions"></div>
+        </div>
+    </header>
+
+    <main class="manage-leads container">
+        <h1>Gerenciar Leads</h1>
+        <!-- Alteração aqui: Mudamos o ID para 'add-lead-button' -->
+        <button id="add-lead-button" class="btn btn-primary">Adicionar Novo Lead</button>
+        <div class="leads-filters">
+            <select id="status-filter">
+                <option value="">Todos os status</option>
+                <option value="novo">Novo</option>
+                <option value="em_contato">Em contato</option>
+                <option value="qualificado">Qualificado</option>
+                <option value="perdido">Perdido</option>
+                <option value="convertido">Convertido</option>
+            </select>
+        </div>
+        <table id="leads-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Interesse</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="leads-table-body">
+                <!-- Os leads serão inseridos aqui dinamicamente -->
+            </tbody>
+        </table>
+
+        <!-- Adicione este formulário após a tabela de leads -->
+        <div id="lead-form-container" style="display: none;">
+            <h2 id="lead-form-title">Adicionar Novo Lead</h2>
+            <form id="lead-form">
+                <input type="text" id="name" name="name" required>
+                <input type="email" id="email" name="email" required>
+                <input type="tel" id="phone" name="phone" required>
+                <select id="interest" name="interest" required>
+                    <option value="">Selecione o interesse</option>
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                    <!-- Adicione outras opções conforme necessário -->
+                </select>
+                <select id="status" name="status" required>
+                    <option value="">Selecione o status</option>
+                    <option value="novo">Novo</option>
+                    <option value="em_andamento">Em andamento</option>
+                    <option value="fechado">Fechado</option>
+                    <!-- Adicione outras opções conforme necessário -->
+                </select>
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+    </main>
+
+    <nav class="bottom-menu">
+        <!-- O menu será preenchido dinamicamente pelo JavaScript -->
+    </nav>
+
+    <!-- Remova ou comente esta linha -->
+    <!-- <script src="./js/config.js"></script> -->
+
+    <!-- Certifique-se de que este script está como type="module" -->
+    <script type="module" src="./js/manage-leads.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/menu.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>

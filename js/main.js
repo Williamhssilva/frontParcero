@@ -168,25 +168,45 @@ function displayProperties(properties) {
         propertyGrid.appendChild(propertyCard);
     });
     setupLazyLoading();
+    setupPropertyCardListeners(); // Adicione esta linha
 }
 
 function createPropertyCard(property) {
     const card = document.createElement('div');
     card.className = 'property-card' + (property.featured ? ' featured' : '');
     
+    // Usar 3 imagens de overlay para cada imóvel
+    const overlayImages = [
+        'https://via.placeholder.com/800x600.png?text=Imagem+1',
+        'https://via.placeholder.com/800x600.png?text=Imagem+2',
+        'https://via.placeholder.com/800x600.png?text=Imagem+3'
+    ];
+    
     card.innerHTML = `
-        <div class="property-image">
-            <img src="https://placehold.co/600x400?text=Loading" data-src="${property.image}" alt="${property.title}" class="lazy-image">
+        <div class="property-image-container">
+            <img src="${overlayImages[0]}" alt="${property.title}" class="property-image">
+            <div class="property-overlay">
+                <button class="btn-action btn-view" data-id="${property._id}" title="Ver Detalhes">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-action btn-favorite" data-id="${property._id}" title="Favoritar">
+                    <i class="far fa-heart"></i>
+                </button>
+                <button class="btn-action btn-share" data-id="${property._id}" title="Compartilhar">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
         </div>
-        <h3>${property.title}</h3>
-        <p class="price">R$ ${property.price.toLocaleString('pt-BR')}</p>
-        <p class="address">${property.address.street}, ${property.address.city} - ${property.address.state}</p>
-        <p class="details">
-            <span>${property.bedrooms} quartos</span> | 
-            <span>${property.bathrooms} banheiros</span> | 
-            <span>${property.area} m²</span>
-        </p>
-        <a href="property-details.html?id=${property._id}">Ver Detalhes</a>
+        <div class="property-info">
+            <h3>${property.title}</h3>
+            <p class="price">R$ ${property.price.toLocaleString('pt-BR')}</p>
+            <p class="address">${property.address.street}, ${property.address.city} - ${property.address.state}</p>
+            <p class="details">
+                <span>${property.bedrooms} quartos</span> | 
+                <span>${property.bathrooms} banheiros</span> | 
+                <span>${property.area} m²</span>
+            </p>
+        </div>
     `;
     return card;
 }
@@ -212,4 +232,32 @@ function setupLazyLoading() {
     });
 
     lazyImages.forEach(img => imageObserver.observe(img));
+}
+
+function setupPropertyCardListeners() {
+    document.querySelectorAll('.btn-view').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const propertyId = button.getAttribute('data-id');
+            window.location.href = `property-details.html?id=${propertyId}`;
+        });
+    });
+
+    document.querySelectorAll('.btn-favorite').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const propertyId = button.getAttribute('data-id');
+            // Implemente a lógica para favoritar a propriedade
+            console.log(`Favoritar propriedade: ${propertyId}`);
+        });
+    });
+
+    document.querySelectorAll('.btn-share').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const propertyId = button.getAttribute('data-id');
+            // Implemente a lógica para compartilhar a propriedade
+            console.log(`Compartilhar propriedade: ${propertyId}`);
+        });
+    });
 }

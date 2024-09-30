@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciar Propriedades | Parcero Imóveis</title>
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/manage-properties.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="./css/manage-properties.css">
 </head>
 <body>
     <header>
@@ -63,12 +64,26 @@
                 <button id="edit-property-btn" class="btn btn-primary">Editar Propriedade</button>
             </div>
             <div id="property-edit-mode" style="display: none;">
-                <!-- O conteúdo do modo de edição permanece o mesmo -->
+                <h2 class="edit-modal-title">Editar Propriedade</h2>
+                <form id="edit-property-form" class="edit-property-form">
+                    <div class="form-group">
+                        <div >Título:</div>
+                        <div class="input-wrapper">
+                            <input type="text" id="edit-title" name="title" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-price">Preço (R$):</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="edit-price" name="price" required>
+                        </div>
+                    </div>
+                    <!-- Repita este padrão para os outros campos -->
+                </form>
             </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/config.js"></script>

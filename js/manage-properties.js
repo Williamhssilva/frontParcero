@@ -14,7 +14,16 @@ document.addEventListener('DOMContentLoaded', () => {
         setupSearch();
         loadAllProperties();
         setupModal(); // Adicione esta linha
+        checkUrlParams(); // Adicione esta linha
     }
+
+    // Adicionar event listeners para os botões "Ver Detalhes"
+    document.querySelectorAll('.view-details-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const propertyId = button.getAttribute('data-id');
+            showPropertyDetails(propertyId);
+        });
+    });
 });
 
 function setupSearch() {
@@ -84,40 +93,68 @@ function displayProperties(page) {
         const propertyCard = document.createElement('div');
         propertyCard.className = 'property-card';
         propertyCard.innerHTML = `
-            <img src="${property.image}" alt="${property.title}" class="property-image">
+            <div class="property-image-container">
+                <img src="https://via.placeholder.com/300x200.png?text=Imóvel" alt="${property.title}" class="property-image">
+                <div class="property-overlay">
+                    <button class="btn-action btn-view" data-id="${property._id}" title="Ver Detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-action btn-edit" data-id="${property._id}" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action btn-delete" data-id="${property._id}" title="Excluir">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
             <div class="property-info">
                 <h3 class="property-title">${property.title}</h3>
                 <p class="property-price">R$ ${property.price.toLocaleString('pt-BR')}</p>
-                <div class="property-actions">
-                    <button class="btn btn-secondary view-details-btn" data-id="${property._id}">Ver Detalhes</button>
-                    <a href="edit-property.html?id=${property._id}" class="btn btn-secondary">Editar</a>
-                    <button class="btn btn-danger delete-btn" data-id="${property._id}">Excluir</button>
-                </div>
+                <p class="property-status">Status: ${property.status}</p>
             </div>
         `;
         propertiesList.appendChild(propertyCard);
     });
 
     // Adicionar event listeners para os botões
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', () => deleteProperty(button.getAttribute('data-id')));
+    document.querySelectorAll('.btn-view').forEach(button => {
+        button.addEventListener('click', () => showPropertyDetails(button.getAttribute('data-id')));
     });
 
-    document.querySelectorAll('.view-details-btn').forEach(button => {
-        button.addEventListener('click', () => showPropertyDetails(button.getAttribute('data-id')));
+    document.querySelectorAll('.btn-edit').forEach(button => {
+        button.addEventListener('click', () => {
+            const propertyId = button.getAttribute('data-id');
+            showPropertyDetails(propertyId);
+            setTimeout(() => showEditMode(), 100); // Pequeno delay para garantir que o modal esteja aberto
+        });
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            const propertyId = button.getAttribute('data-id');
+            deleteProperty(propertyId);
+        });
     });
 }
 
 async function showPropertyDetails(propertyId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`);
+        const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Falha ao carregar detalhes da propriedade');
         }
         const data = await response.json();
         const property = data.data;
 
-        // Imagens de overlay
+        // Armazenar a propriedade atual para uso na edição
+        currentProperty = property;
+
+        // Usar 3 imagens de overlay para cada imóvel
         const overlayImages = [
             'https://via.placeholder.com/800x600.png?text=Imagem+1',
             'https://via.placeholder.com/800x600.png?text=Imagem+2',
@@ -129,37 +166,59 @@ async function showPropertyDetails(propertyId) {
 
         modalContent.innerHTML = `
             <span class="close">&times;</span>
-            <h2>${property.title}</h2>
-            <div class="property-gallery">
-                <div class="swiper-container gallery-top">
-                    <div class="swiper-wrapper">
-                        ${overlayImages.map(img => `
-                            <div class="swiper-slide">
-                                <img src="${img}" alt="Imagem da propriedade">
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+            <div id="property-view-mode">
+                <div class="property-header">
+                    <h2>${property.title}</h2>
+                    <p class="property-price">R$ ${property.price.toLocaleString('pt-BR')}</p>
                 </div>
-                <div class="swiper-container gallery-thumbs">
-                    <div class="swiper-wrapper">
-                        ${overlayImages.map(img => `
-                            <div class="swiper-slide">
-                                <img src="${img}" alt="Miniatura da imagem">
-                            </div>
-                        `).join('')}
+                <div class="property-gallery">
+                    <div class="swiper-container gallery-top">
+                        <div class="swiper-wrapper">
+                            ${overlayImages.map(img => `
+                                <div class="swiper-slide">
+                                    <img src="${img}" alt="Imagem da propriedade">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                    <div class="swiper-container gallery-thumbs">
+                        <div class="swiper-wrapper">
+                            ${overlayImages.map(img => `
+                                <div class="swiper-slide">
+                                    <img src="${img}" alt="Miniatura da imagem">
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
+                <div class="property-info">
+                    <p><strong>Endereço:</strong> ${property.address.street}, ${property.address.city} - ${property.address.state}</p>
+                    <p><strong>Quartos:</strong> ${property.bedrooms}</p>
+                    <p><strong>Banheiros:</strong> ${property.bathrooms}</p>
+                    <p><strong>Área:</strong> ${property.area} m²</p>
+                    <p><strong>Tipo:</strong> ${property.type}</p>
+                    <p><strong>Status:</strong> ${property.status}</p>
+                    <p><strong>Descrição:</strong> ${property.description}</p>
+                </div>
+                <button id="edit-property-btn" class="btn btn-primary">Editar Propriedade</button>
             </div>
-            <p><strong>Preço:</strong> R$ ${property.price.toLocaleString('pt-BR')}</p>
-            <p><strong>Endereço:</strong> ${property.address.street}, ${property.address.city} - ${property.address.state}</p>
-            <p><strong>Quartos:</strong> ${property.bedrooms}</p>
-            <p><strong>Banheiros:</strong> ${property.bathrooms}</p>
-            <p><strong>Área:</strong> ${property.area} m²</p>
-            <p><strong>Tipo:</strong> ${property.type}</p>
-            <p><strong>Status:</strong> ${property.status}</p>
-            <p><strong>Descrição:</strong> ${property.description}</p>
+            <div id="property-edit-mode" style="display: none;">
+                <h2>Editar Propriedade</h2>
+                <form id="edit-property-form">
+                    <input type="text" id="edit-title" name="title" placeholder="Título" required>
+                    <input type="number" id="edit-price" name="price" placeholder="Preço" required>
+                    <input type="text" id="edit-address" name="address" placeholder="Endereço" required>
+                    <input type="number" id="edit-bedrooms" name="bedrooms" placeholder="Quartos" required>
+                    <input type="number" id="edit-bathrooms" name="bathrooms" placeholder="Banheiros" required>
+                    <input type="number" id="edit-area" name="area" placeholder="Área" required>
+                    <textarea id="edit-description" name="description" placeholder="Descrição" required></textarea>
+                    <div id="edit-images-container"></div>
+                    <button type="submit">Salvar Alterações</button>
+                    <button type="button" id="cancel-edit">Cancelar</button>
+                </form>
+            </div>
         `;
 
         modal.style.display = 'block';
@@ -177,24 +236,33 @@ async function showPropertyDetails(propertyId) {
                 modal.style.display = 'none';
             }
         }
+
+        // Adicionar event listener para o botão de editar
+        document.getElementById('edit-property-btn').addEventListener('click', showEditMode);
+
+        // Adicionar event listener para o formulário de edição
+        document.getElementById('edit-property-form').addEventListener('submit', updateProperty);
+
+        // Adicionar event listener para o botão de cancelar edição
+        document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+
     } catch (error) {
         console.error('Erro ao carregar detalhes da propriedade:', error);
-        alert('Erro ao carregar detalhes da propriedade');
+        showNotification('Erro ao carregar detalhes da propriedade. Por favor, tente novamente.', 'error');
     }
 }
 
 function initializeModalCarousel() {
     const galleryThumbs = new Swiper('.gallery-thumbs', {
         spaceBetween: 10,
-        slidesPerView: 4,
+        slidesPerView: 3,
         freeMode: true,
         watchSlidesVisibility: true,
         watchSlidesProgress: true,
     });
 
-    const galleryTop = new Swiper('.gallery-top', {
+    new Swiper('.gallery-top', {
         spaceBetween: 10,
-        effect: 'fade',  // Adiciona efeito de fade entre slides
         navigation: {
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev',
@@ -209,50 +277,91 @@ function showEditMode() {
     document.getElementById('property-view-mode').style.display = 'none';
     document.getElementById('property-edit-mode').style.display = 'block';
 
-    document.getElementById('edit-title').value = currentProperty.title || '';
-    document.getElementById('edit-price').value = currentProperty.price || '';
-    document.getElementById('edit-address').value = currentProperty.address ? 
-        `${currentProperty.address.street}, ${currentProperty.address.city} - ${currentProperty.address.state}` : '';
-    document.getElementById('edit-bedrooms').value = currentProperty.bedrooms || '';
-    document.getElementById('edit-bathrooms').value = currentProperty.bathrooms || '';
-    document.getElementById('edit-area').value = currentProperty.area || '';
-    document.getElementById('edit-description').value = currentProperty.description || '';
+    // Preencher o formulário com os dados atuais da propriedade
+    document.getElementById('edit-title').value = currentProperty.title;
+    document.getElementById('edit-price').value = currentProperty.price;
+    document.getElementById('edit-address').value = `${currentProperty.address.street}, ${currentProperty.address.city} - ${currentProperty.address.state}`;
+    document.getElementById('edit-bedrooms').value = currentProperty.bedrooms;
+    document.getElementById('edit-bathrooms').value = currentProperty.bathrooms;
+    document.getElementById('edit-area').value = currentProperty.area;
+    document.getElementById('edit-description').value = currentProperty.description;
 
+    // Adicionar o campo de status, se existir
+    const statusSelect = document.getElementById('edit-status');
+    if (statusSelect) {
+        statusSelect.value = currentProperty.status;
+    }
+
+    // Garantir que os campos sejam editáveis
+    const editForm = document.getElementById('edit-property-form');
+    const inputs = editForm.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.removeAttribute('readonly');
+        input.removeAttribute('disabled');
+    });
+
+    // Exibir as imagens atuais (se houver)
     const imagesContainer = document.getElementById('edit-images-container');
     imagesContainer.innerHTML = '';
     if (currentProperty.images && Array.isArray(currentProperty.images)) {
         currentProperty.images.forEach((imageUrl, index) => {
             const imgContainer = document.createElement('div');
-            imgContainer.style.position = 'relative';
-            const img = document.createElement('img');
-            img.src = imageUrl;
-            img.alt = `Imagem ${index + 1}`;
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'X';
-            deleteBtn.className = 'image-delete-btn';
-            deleteBtn.onclick = () => deleteImage(index);
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(deleteBtn);
+            imgContainer.innerHTML = `
+                <img src="${imageUrl}" alt="Imagem ${index + 1}">
+                <button type="button" class="remove-image" data-index="${index}">Remover</button>
+            `;
             imagesContainer.appendChild(imgContainer);
         });
     }
 
-    document.getElementById('edit-property-form').addEventListener('submit', updateProperty);
-    document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
-}
+    // Adicionar listener para remover imagens
+    imagesContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-image')) {
+            const index = parseInt(e.target.dataset.index);
+            currentProperty.images.splice(index, 1);
+            showEditMode(); // Recarregar o modo de edição
+        }
+    });
 
-function cancelEdit() {
-    document.getElementById('property-edit-mode').style.display = 'none';
-    document.getElementById('property-view-mode').style.display = 'block';
+    // Forçar a exibição das labels
+    const labels = document.querySelectorAll('#property-edit-mode label');
+    labels.forEach(label => {
+        label.style.display = 'block';
+        label.style.position = 'static';
+        label.style.opacity = '1';
+        label.style.pointerEvents = 'auto';
+    });
 }
 
 async function updateProperty(event) {
     event.preventDefault();
-    
     const formData = new FormData(event.target);
     const updatedProperty = Object.fromEntries(formData.entries());
+
+    // Converter valores numéricos
+    updatedProperty.price = parseFloat(updatedProperty.price);
+    updatedProperty.bedrooms = parseInt(updatedProperty.bedrooms);
+    updatedProperty.bathrooms = parseInt(updatedProperty.bathrooms);
+    updatedProperty.area = parseFloat(updatedProperty.area);
+
+    // Separar o endereço em partes
+    const [street, cityState] = updatedProperty.address.split(',');
+    const [city, state] = cityState.trim().split('-');
+    updatedProperty.address = { 
+        street: street.trim(), 
+        city: city.trim(), 
+        state: state.trim(),
+        zipCode: currentProperty.address.zipCode // Manter o CEP original
+    };
+
+    // Adicionar as imagens existentes
+    updatedProperty.images = currentProperty.images;
+
+    // Adicionar campos que podem não estar no formulário, mas são necessários
+    updatedProperty.type = currentProperty.type;
     
-    // Adicionar lógica para lidar com as imagens aqui
+    // Usar um valor válido para status
+    updatedProperty.status = currentProperty.status === 'disponível' ? 'ativo' : currentProperty.status;
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/properties/${currentProperty._id}`, {
@@ -265,25 +374,33 @@ async function updateProperty(event) {
         });
 
         if (!response.ok) {
-            throw new Error('Falha ao atualizar a propriedade');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Falha ao atualizar a propriedade');
         }
 
         const data = await response.json();
         currentProperty = data.data;
 
-        alert('Propriedade atualizada com sucesso!');
+        showNotification('Propriedade atualizada com sucesso!', 'success');
         cancelEdit();
-        showPropertyDetails(currentProperty._id);
-        loadAllProperties(); // Recarregar a lista de propriedades
+        updatePropertyDetailsView(currentProperty);
+        updatePropertyCard(currentProperty);
+        
+        // Atualizar a lista de propriedades
+        const index = allProperties.findIndex(p => p._id === currentProperty._id);
+        if (index !== -1) {
+            allProperties[index] = currentProperty;
+            displayProperties(currentPage);
+        }
     } catch (error) {
         console.error('Erro ao atualizar a propriedade:', error);
-        alert('Erro ao atualizar a propriedade. Por favor, tente novamente.');
+        showNotification('Erro ao atualizar a propriedade: ' + error.message, 'error');
     }
 }
 
-function deleteImage(index) {
-    currentProperty.images.splice(index, 1);
-    showEditMode(); // Recarregar o modo de edição para refletir a mudança
+function cancelEdit() {
+    document.getElementById('property-edit-mode').style.display = 'none';
+    document.getElementById('property-view-mode').style.display = 'block';
 }
 
 function updatePagination(currentPage, totalPages) {
@@ -344,3 +461,150 @@ function setupModal() {
 }
 
 // ... (mantenha as funções deleteProperty e showPropertyDetails como estavam antes)
+
+// Adicione esta função
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const res = urlParams.get('res');
+
+    if (res === '1') {
+        showNotification('Propriedade adicionada com sucesso!', 'success');
+    } else if (res === '0') {
+        showNotification('Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
+    }
+}
+
+// Adicione esta função se ainda não existir
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 5000);
+}
+
+async function deleteProperty(propertyId) {
+    if (confirm('Tem certeza que deseja excluir esta propriedade?')) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha ao excluir a propriedade');
+            }
+
+            showNotification('Propriedade excluída com sucesso!', 'success');
+            loadAllProperties(); // Recarregar a lista de propriedades
+        } catch (error) {
+            console.error('Erro ao excluir a propriedade:', error);
+            showNotification('Erro ao excluir a propriedade. Por favor, tente novamente.', 'error');
+        }
+    }
+}
+
+function updatePropertyDetailsView(property) {
+    const modal = document.getElementById('property-details-modal');
+    if (!modal || modal.style.display === 'none') {
+        // Se a modal não estiver visível, apenas atualize os dados armazenados
+        currentProperty = property;
+        return;
+    }
+
+    const elements = {
+        title: document.getElementById('modal-property-title'),
+        price: document.getElementById('modal-property-price'),
+        address: document.getElementById('modal-property-address'),
+        details: document.getElementById('modal-property-details'),
+        description: document.getElementById('modal-property-description')
+    };
+
+    // Atualizar apenas os elementos que existem
+    if (elements.title) elements.title.textContent = property.title;
+    if (elements.price) elements.price.textContent = `R$ ${property.price.toLocaleString('pt-BR')}`;
+    if (elements.address) elements.address.textContent = `${property.address.street}, ${property.address.city} - ${property.address.state}`;
+    if (elements.details) elements.details.textContent = `${property.bedrooms} quartos | ${property.bathrooms} banheiros | ${property.area} m²`;
+    if (elements.description) elements.description.textContent = property.description;
+
+    // Atualizar imagens no carrossel
+    updatePropertyImages(property.images);
+}
+
+function updatePropertyImages(images) {
+    const imagesContainer = document.getElementById('modal-property-images');
+    if (!imagesContainer) return;
+
+    imagesContainer.innerHTML = '';
+    images.forEach((imageUrl, index) => {
+        const imgElement = document.createElement('img');
+        imgElement.src = imageUrl;
+        imgElement.alt = `Imagem ${index + 1} da propriedade`;
+        imagesContainer.appendChild(imgElement);
+    });
+
+    const imageOverlay = document.querySelector('.image-overlay');
+    if (imageOverlay) {
+        imageOverlay.textContent = `1/${images.length}`;
+    }
+
+    // Reinicializar o carrossel
+    initializeCarousel();
+}
+
+function updatePropertyCard(property) {
+    const card = document.querySelector(`.property-card[data-id="${property._id}"]`);
+    if (card) {
+        const elements = {
+            title: card.querySelector('.property-title'),
+            price: card.querySelector('.property-price'),
+            address: card.querySelector('.property-address'),
+            details: card.querySelector('.property-details'),
+            image: card.querySelector('.property-image')
+        };
+
+        if (elements.title) elements.title.textContent = property.title;
+        if (elements.price) elements.price.textContent = `R$ ${property.price.toLocaleString('pt-BR')}`;
+        if (elements.address) elements.address.textContent = `${property.address.street}, ${property.address.city} - ${property.address.state}`;
+        if (elements.details) elements.details.textContent = `${property.bedrooms} quartos | ${property.bathrooms} banheiros | ${property.area} m²`;
+        
+        if (elements.image && property.images.length > 0) {
+            elements.image.style.backgroundImage = `url('${property.images[0]}')`;
+        }
+    }
+}
+
+function initializeCarousel() {
+    const galleryTop = new Swiper('.gallery-top', {
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        loop: true,
+    });
+
+    const galleryThumbs = new Swiper('.gallery-thumbs', {
+        spaceBetween: 10,
+        centeredSlides: true,
+        slidesPerView: 'auto',
+        touchRatio: 0.2,
+        slideToClickedSlide: true,
+        loop: true,
+    });
+
+    galleryTop.controller.control = galleryThumbs;
+    galleryThumbs.controller.control = galleryTop;
+}

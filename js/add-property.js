@@ -79,14 +79,11 @@ async function handleSubmit(event) {
             throw new Error(data.message || 'Falha ao adicionar propriedade');
         }
 
-        showToast('Propriedade adicionada com sucesso!', 'success');
-        console.log('Propriedade criada:', data.data);
-        setTimeout(() => {
-            window.location.href = 'manage-properties.html';
-        }, 2000);
+        showNotification('Propriedade adicionada com sucesso!', 'success');
+        form.reset(); // Limpa o formulário após o sucesso
     } catch (error) {
         console.error('Erro ao adicionar propriedade:', error);
-        showToast(error.message || 'Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
+        showNotification('Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
     } finally {
         hideLoading();
     }
@@ -144,4 +141,22 @@ function showToast(message, type) {
             document.body.removeChild(toast);
         }, 300);
     }, 3000);
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 5000);
 }

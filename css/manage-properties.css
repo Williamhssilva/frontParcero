@@ -15,22 +15,79 @@
 }
 
 .property-card {
+    position: relative;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .property-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.property-image-container {
+    position: relative;
+    overflow: hidden;
 }
 
 .property-image {
     width: 100%;
-    height: 150px;
+    height: 200px;
     object-fit: cover;
+    transition: transform 0.3s ease;
 }
+
+.property-card:hover .property-image {
+    transform: scale(1.05);
+}
+
+.property-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.property-card:hover .property-overlay {
+    opacity: 1;
+}
+
+.btn-action {
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.1);
+}
+
+.btn-action i {
+    font-size: 18px;
+}
+
+.btn-view i { color: #4CAF50; }
+.btn-edit i { color: #2196F3; }
+.btn-delete i { color: #f44336; }
 
 .property-info {
     padding: 15px;
@@ -45,7 +102,12 @@
 .property-price {
     font-size: 16px;
     color: #4CAF50;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+.property-status {
+    font-size: 14px;
+    color: #757575;
 }
 
 .property-actions {
@@ -244,7 +306,6 @@
 
 .property-gallery {
     margin-bottom: 20px;
-    overflow: hidden;  /* Esconde qualquer conteúdo que ultrapasse os limites */
 }
 
 .gallery-top {
@@ -252,13 +313,10 @@
     width: 100%;
 }
 
-.gallery-top .swiper-slide {
-    opacity: 0;  /* Torna todos os slides invisíveis por padrão */
-    transition: opacity 0.3s ease;  /* Adiciona uma transição suave */
-}
-
-.gallery-top .swiper-slide-active {
-    opacity: 1;  /* Torna apenas o slide ativo visível */
+.gallery-top .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .gallery-thumbs {
@@ -271,17 +329,29 @@
     width: 25%;
     height: 100%;
     opacity: 0.4;
-    transition: opacity 0.3s ease;
 }
 
 .gallery-thumbs .swiper-slide-thumb-active {
     opacity: 1;
 }
 
-.swiper-slide img {
+.gallery-thumbs .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 30px 15px;
+    transition: background-color 0.3s ease;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* Ajusta o tamanho da modal para garantir que caiba na tela */
@@ -289,4 +359,206 @@
     max-width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+/* Estilos para a modal de edição */
+#property-edit-mode {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+}
+
+.edit-modal-title {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.edit-property-form {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.input-wrapper {
+    width: 100%;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Estilos específicos para sobrepor qualquer outro estilo */
+#property-edit-mode .form-group label {
+    display: block !important;
+    position: static !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background-color: #f9f9f9;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    outline: none;
+    background-color: #ffffff;
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.edit-images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.edit-images-container img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.edit-images-container img:hover {
+    transform: scale(1.05);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-save {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #2980b9;
+    box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.btn-cancel {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #c0392b;
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    #property-edit-mode {
+        padding: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Adicione ou atualize estas regras */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
 }

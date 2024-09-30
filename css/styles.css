@@ -262,3 +262,81 @@ header {
 .dashboard-actions, .manage-actions {
     margin-bottom: 20px;
 }
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.success {
+    background-color: #4CAF50;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+.notification.info {
+    background-color: #2196F3;
+}
+
+.property-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.property-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.property-card:hover .property-overlay {
+    opacity: 1;
+}
+
+.btn-action {
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-action:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.1);
+}
+
+.btn-action i {
+    font-size: 18px;
+}
+
+.btn-view i { color: #4CAF50; }
+.btn-favorite i { color: #FF4081; }
+.btn-share i { color: #2196F3; }

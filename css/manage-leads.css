@@ -69,11 +69,13 @@
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .close {
@@ -98,6 +100,8 @@
 .form-group label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
 }
 
 .form-group input,
@@ -106,6 +110,41 @@
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.btn-secondary {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #e7e7e7;
 }
 
 @media (max-width: 768px) {
@@ -153,9 +192,16 @@
 
 .sales-funnel {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Alterado de space-between para flex-start */
     overflow-x: auto;
     padding-bottom: 20px;
+    height: 80vh;
+    cursor: grab; /* Indica que o elemento é arrastável */
+    user-select: none; /* Previne seleção de texto durante o arrasto */
+}
+
+.sales-funnel:active {
+    cursor: grabbing; /* Muda o cursor quando está arrastando */
 }
 
 .stage {
@@ -164,34 +210,38 @@
     background-color: #f4f4f4;
     border-radius: 5px;
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Faz o .stage ocupar toda a altura do .sales-funnel */
 }
 
 .stage h3 {
-    text-align: center;
+    margin-top: 0;
     margin-bottom: 10px;
 }
 
 .stage-leads {
-    min-height: 100px;
+    flex-grow: 1; /* Faz o .stage-leads crescer e preencher o espaço restante */
+    overflow-y: auto; /* Adiciona rolagem vertical se necessário */
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
 }
 
 .lead-card {
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 4px;
     padding: 10px;
     margin-bottom: 10px;
-    cursor: move;
 }
 
-.lead-card h4 {
-    margin: 0 0 5px 0;
+.lead-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.lead-card p {
-    margin: 0;
-    font-size: 0.9em;
-    color: #666;
+.lead-card:active {
+    cursor: grabbing;
 }
 
 /* ... (resto do CSS permanece o mesmo) ... */
@@ -203,4 +253,30 @@
     padding: 5px 10px;
     cursor: pointer;
     margin-top: 5px;
+}
+
+/* Estilos para o Sortable */
+.sortable-ghost {
+    opacity: 0.6;
+    background-color: #f0f0f0;
+}
+
+.sortable-chosen {
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.sortable-drag {
+    opacity: 1;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transform: rotate(2deg);
+}
+
+.lead-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stage-placeholder {
+    min-height: 50px;
 }

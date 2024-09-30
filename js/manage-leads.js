@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupEventListeners();
         loadLeads();
         initializeSortable();
+        initializeDraggableScroll(); // Adicione esta linha
     }
 });
 
@@ -23,12 +24,56 @@ function initializeSortable() {
         new Sortable(stage, {
             group: 'shared',
             animation: 150,
+            ghostClass: 'sortable-ghost',  // Classe para o elemento fantasma durante o arrasto
+            chosenClass: 'sortable-chosen',  // Classe para o elemento escolhido
+            dragClass: 'sortable-drag',  // Classe para o elemento sendo arrastado
             onEnd: function (evt) {
                 const leadId = evt.item.getAttribute('data-id');
                 const newStage = evt.to.getAttribute('data-stage');
                 updateLeadStage(leadId, newStage);
-            }
+            },
+            // Ajuste estas opções:
+            forceFallback: false,  // Desativa o fallback para melhorar o desempenho
+            fallbackTolerance: 0,  // Reduz a tolerância para iniciar o arrasto
+            fallbackOnBody: false, // Desativa para melhorar o desempenho
+            swapThreshold: 1,      // Ajusta para permitir soltar em qualquer lugar
+            direction: 'vertical'  // Garante que o arrasto seja vertical
         });
+    });
+}
+
+function initializeDraggableScroll() {
+    const salesFunnel = document.querySelector('.sales-funnel');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    salesFunnel.addEventListener('mousedown', (e) => {
+        // Ignora se o clique for em um card ou em um elemento dentro do card
+        if (e.target.closest('.lead-card')) return;
+        
+        isDown = true;
+        salesFunnel.style.cursor = 'grabbing';
+        startX = e.pageX - salesFunnel.offsetLeft;
+        scrollLeft = salesFunnel.scrollLeft;
+    });
+
+    salesFunnel.addEventListener('mouseleave', () => {
+        isDown = false;
+        salesFunnel.style.cursor = 'default';
+    });
+
+    salesFunnel.addEventListener('mouseup', () => {
+        isDown = false;
+        salesFunnel.style.cursor = 'default';
+    });
+
+    salesFunnel.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - salesFunnel.offsetLeft;
+        const walk = (x - startX) * 2; // Ajuste o multiplicador para controlar a velocidade do scroll
+        salesFunnel.scrollLeft = scrollLeft - walk;
     });
 }
 
@@ -386,3 +431,4 @@ function preparePresentationMaterial(lead) {
 // Torna as funções disponíveis globalmente
 window.showStageActions = showStageActions;
 window.showLeadDetails = showLeadDetails;
+window.closeForm = closeForm;

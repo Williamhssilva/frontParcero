@@ -51,50 +51,60 @@
                 <option value="investimento">Investimento</option>
             </select>
         </div>
-        <table id="leads-table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Telefone</th>
-                    <th>Interesse</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="leads-table-body">
-                <!-- Os leads serão inseridos aqui dinamicamente -->
-            </tbody>
-        </table>
+        
 
         <!-- Adicione este formulário após a tabela de leads -->
-        <div id="lead-form-container" style="display: none;">
-            <h2 id="lead-form-title">Adicionar Novo Lead</h2>
-            <form id="lead-form">
-                <input type="text" id="name" name="name" required>
-                <input type="email" id="email" name="email" required>
-                <input type="tel" id="phone" name="phone" required>
-                <select id="interest" name="interest" required>
-                    <option value="">Selecione o interesse</option>
-                    <option value="compra">Compra</option>
-                    <option value="venda">Venda</option>
-                    <!-- Adicione outras opções conforme necessário -->
-                </select>
-                <select id="status" name="status" required>
-                    <option value="">Selecione o status</option>
-                    <option value="novo">Novo</option>
-                    <option value="em_andamento">Em andamento</option>
-                    <option value="fechado">Fechado</option>
-                    <!-- Adicione outras opções conforme necessário -->
-                </select>
-                <button type="submit">Salvar</button>
-            </form>
+        <div id="lead-form-container" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2 id="lead-form-title">Adicionar Novo Lead</h2>
+                <form id="lead-form">
+                    <div class="form-group">
+                        <label for="name">Nome</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefone</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="interest">Interesse</label>
+                        <select id="interest" name="interest" required>
+                            <option value="">Selecione o interesse</option>
+                            <option value="compra">Compra</option>
+                            <option value="venda">Venda</option>
+                            <option value="aluguel">Aluguel</option>
+                            <option value="investimento">Investimento</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required>
+                            <option value="">Selecione o status</option>
+                            <option value="novo">Novo</option>
+                            <option value="em_andamento">Em andamento</option>
+                            <option value="qualificado">Qualificado</option>
+                            <option value="perdido">Perdido</option>
+                            <option value="convertido">Convertido</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeForm()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div class="sales-funnel">
             <div class="stage" id="novo">
                 <h3>Novo</h3>
-                <div class="stage-leads" data-stage="novo"></div>
+                <div class="stage-leads" data-stage="novo">
+                    <!-- Os cards de lead serão inseridos aqui dinamicamente -->
+                </div>
             </div>
             <div class="stage" id="contatoInicial">
                 <h3>Contato Inicial</h3>

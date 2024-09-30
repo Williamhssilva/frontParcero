@@ -11,8 +11,8 @@ Este é o frontend do sistema Parcero Imóveis, uma plataforma para gerenciament
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/seu-usuario/parcero-frontend.git
-   cd parcero-frontend
+   git clone https://github.com/seu-usuario/frontParcero.git
+   cd frontParcero
    ```
 
 2. Instale as dependências:
@@ -31,17 +31,18 @@ Este é o frontend do sistema Parcero Imóveis, uma plataforma para gerenciament
 ## Executando o projeto
 
 Para iniciar o servidor de desenvolvimento:
-
+```
 npm start
-
+```
 O aplicativo estará disponível em `http://localhost:5000`.
 
 ## Build para produção
-
+```
+npm start
+```
 Para criar uma versão otimizada para produção:
 
 npm run build
-
 
 Os arquivos de build estarão na pasta `dist/`.
 
@@ -54,7 +55,7 @@ Os arquivos de build estarão na pasta `dist/`.
 
 ## Contribuindo
 
-Por favor, leia CONTRIBUTING.md para detalhes sobre nosso código de conduta e o processo para enviar pull requests.
+Por favor, leia CONTRIBUTING.md para detalhes sobre nosso código de conduta e o processo para enviar pull requests (não implementado).
 
 ## Licença
 

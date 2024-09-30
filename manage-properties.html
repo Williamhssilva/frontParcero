@@ -46,15 +46,25 @@
                     <p id="modal-property-price" class="property-price"></p>
                 </div>
                 <div class="property-gallery">
-                    <div id="modal-property-images" class="property-images-carousel">
-                        <!-- Imagens serão inseridas aqui dinamicamente -->
+                    <div class="swiper-container gallery-top">
+                        <div class="swiper-wrapper" id="modal-property-images">
+                            <!-- Imagens serão inseridas aqui dinamicamente -->
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
                     </div>
-                    <div class="image-overlay">1/5</div>
+                    <div class="swiper-container gallery-thumbs">
+                        <div class="swiper-wrapper" id="modal-property-thumbs">
+                            <!-- Miniaturas serão inseridas aqui dinamicamente -->
+                        </div>
+                    </div>
                 </div>
                 <div class="property-info">
                     <div class="property-details">
+                        <h3>Detalhes da Propriedade</h3>
                         <p id="modal-property-address"></p>
                         <p id="modal-property-details"></p>
+                        <p id="modal-property-additional-info"></p>
                     </div>
                     <div class="property-description">
                         <h3>Descrição</h3>
@@ -64,21 +74,55 @@
                 <button id="edit-property-btn" class="btn btn-primary">Editar Propriedade</button>
             </div>
             <div id="property-edit-mode" style="display: none;">
-                <h2 class="edit-modal-title">Editar Propriedade</h2>
-                <form id="edit-property-form" class="edit-property-form">
+                <h2>Editar Propriedade</h2>
+                <form id="edit-property-form">
                     <div class="form-group">
-                        <div >Título:</div>
-                        <div class="input-wrapper">
-                            <input type="text" id="edit-title" name="title" required>
-                        </div>
+                        <label for="edit-title">Título</label>
+                        <input type="text" id="edit-title" name="title" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-price">Preço (R$):</label>
-                        <div class="input-wrapper">
-                            <input type="number" id="edit-price" name="price" required>
-                        </div>
+                        <label for="edit-price">Preço de Venda</label>
+                        <input type="number" id="edit-price" name="salePrice" required>
                     </div>
-                    <!-- Repita este padrão para os outros campos -->
+                    <div class="form-group">
+                        <label for="edit-address">Endereço</label>
+                        <input type="text" id="edit-address" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-neighborhood">Bairro</label>
+                        <input type="text" id="edit-neighborhood" name="neighborhood" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-property-type">Tipo de Imóvel</label>
+                        <select id="edit-property-type" name="propertyType" required>
+                            <option value="Casa">Casa</option>
+                            <option value="Apartamento">Apartamento</option>
+                            <option value="Lote">Lote</option>
+                            <option value="Comercial">Comercial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-total-area">Área Total (m²)</label>
+                        <input type="number" id="edit-total-area" name="totalArea" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-built-area">Área Construída (m²)</label>
+                        <input type="number" id="edit-built-area" name="builtArea" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-bedrooms">Quartos</label>
+                        <input type="number" id="edit-bedrooms" name="bedrooms" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-bathrooms">Banheiros</label>
+                        <input type="number" id="edit-bathrooms" name="bathrooms" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-description">Descrição</label>
+                        <textarea id="edit-description" name="description" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
                 </form>
             </div>
         </div>

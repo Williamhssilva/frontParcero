@@ -21,59 +21,175 @@
     <main class="property-form">
         <h1>Adicionar Nova Propriedade</h1>
         <form id="add-property-form">
+            <h2>Informações de Captação</h2>
             <div class="form-group">
-                <label for="title">Título</label>
-                <input type="text" id="title" name="title" required>
+                <label for="captureCity">Cidade de Captação</label>
+                <input type="text" id="captureCity" name="captureCity" required>
             </div>
             <div class="form-group">
-                <label for="description">Descrição</label>
-                <textarea id="description" name="description" required></textarea>
+                <label for="captureCEP">CEP de Captação</label>
+                <input type="text" id="captureCEP" name="captureCEP" required>
             </div>
-            <div class="form-group">
-                <label for="type">Tipo</label>
-                <select id="type" name="type" required>
-                    <option value="casa">Casa</option>
-                    <option value="apartamento">Apartamento</option>
-                    <option value="terreno">Terreno</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="price">Preço</label>
-                <input type="number" id="price" name="price" required>
-            </div>
-            <div class="form-group">
-                <label for="bedrooms">Quartos</label>
-                <input type="number" id="bedrooms" name="bedrooms" required>
-            </div>
-            <div class="form-group">
-                <label for="bathrooms">Banheiros</label>
-                <input type="number" id="bathrooms" name="bathrooms" required>
-            </div>
-            <div class="form-group">
-                <label for="area">Área (m²)</label>
-                <input type="number" id="area" name="area" required>
-            </div>
+
+            <h2>Localização do Imóvel</h2>
             <div class="form-group">
                 <label for="address">Endereço</label>
                 <input type="text" id="address" name="address" required>
             </div>
             <div class="form-group">
-                <label for="city">Cidade</label>
-                <input type="text" id="city" name="city" required>
+                <label for="neighborhood">Bairro</label>
+                <input type="text" id="neighborhood" name="neighborhood" required>
             </div>
             <div class="form-group">
-                <label for="state">Estado</label>
-                <input type="text" id="state" name="state" required>
+                <label for="isCondominium">Condomínio?</label>
+                <input type="checkbox" id="isCondominium" name="isCondominium">
             </div>
             <div class="form-group">
-                <label for="zipCode">CEP</label>
-                <input type="text" id="zipCode" name="zipCode" required>
+                <label for="block">Quadra</label>
+                <input type="text" id="block" name="block">
             </div>
+            <div class="form-group">
+                <label for="apartmentNumber">Número do Apartamento</label>
+                <input type="text" id="apartmentNumber" name="apartmentNumber">
+            </div>
+
+            <h2>Características do Imóvel</h2>
+            <div class="form-group">
+                <label for="propertyType">Tipo de Imóvel</label>
+                <select id="propertyType" name="propertyType" required>
+                    <option value="Casa">Casa</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Lote">Lote</option>
+                    <option value="Comercial">Comercial</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="secondaryType">Tipo Secundário</label>
+                <select id="secondaryType" name="secondaryType">
+                    <option value="Individual">Individual</option>
+                    <option value="Geminada">Geminada</option>
+                    <option value="Sobrado">Sobrado</option>
+                    <option value="Condomínio">Condomínio</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="totalArea">Área Total (m²)</label>
+                <input type="number" id="totalArea" name="totalArea" required>
+            </div>
+            <div class="form-group">
+                <label for="builtArea">Área Construída (m²)</label>
+                <input type="number" id="builtArea" name="builtArea" required>
+            </div>
+
+            <h2>Tipologia do Imóvel</h2>
+            <div class="form-group">
+                <label for="bedrooms">Quartos</label>
+                <input type="number" id="bedrooms" name="bedrooms" required>
+            </div>
+            <div class="form-group">
+                <label for="suites">Suítes</label>
+                <input type="number" id="suites" name="suites" required>
+            </div>
+            <div class="form-group">
+                <label for="socialBathrooms">Banheiros Sociais</label>
+                <input type="number" id="socialBathrooms" name="socialBathrooms" required>
+            </div>
+            <div class="form-group">
+                <label for="hasBackyard">Possui Quintal?</label>
+                <input type="checkbox" id="hasBackyard" name="hasBackyard">
+            </div>
+            <div class="form-group">
+                <label for="hasBalcony">Possui Varanda?</label>
+                <input type="checkbox" id="hasBalcony" name="hasBalcony">
+            </div>
+            <div class="form-group">
+                <label for="hasElevator">Possui Elevador?</label>
+                <input type="checkbox" id="hasElevator" name="hasElevator">
+            </div>
+            <div class="form-group">
+                <label for="floors">Número de Andares</label>
+                <input type="number" id="floors" name="floors">
+            </div>
+            <div class="form-group">
+                <label for="floor">Andar do Apartamento</label>
+                <input type="number" id="floor" name="floor">
+            </div>
+
+            <h2>Informações de Visita</h2>
+            <div class="form-group">
+                <label for="occupancyStatus">Status de Ocupação</label>
+                <select id="occupancyStatus" name="occupancyStatus" required>
+                    <option value="Ocupado">Ocupado</option>
+                    <option value="Desocupado">Desocupado</option>
+                    <option value="Inquilino">Inquilino</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="keyLocation">Localização da Chave</label>
+                <input type="text" id="keyLocation" name="keyLocation">
+            </div>
+            <div class="form-group">
+                <label for="ownerName">Nome do Proprietário</label>
+                <input type="text" id="ownerName" name="ownerName" required>
+            </div>
+            <div class="form-group">
+                <label for="ownerContact">Contato do Proprietário</label>
+                <input type="text" id="ownerContact" name="ownerContact" required>
+            </div>
+
+            <h2>Informações Financeiras</h2>
+            <div class="form-group">
+                <label for="salePrice">Preço de Venda</label>
+                <input type="number" id="salePrice" name="salePrice" required>
+            </div>
+            <div class="form-group">
+                <label for="desiredNetPrice">Preço Líquido Desejado</label>
+                <input type="number" id="desiredNetPrice" name="desiredNetPrice">
+            </div>
+
+            <h2>Contrato de Exclusividade</h2>
+            <div class="form-group">
+                <label for="exclusivityStartDate">Data de Início</label>
+                <input type="date" id="exclusivityStartDate" name="exclusivityStartDate">
+            </div>
+            <div class="form-group">
+                <label for="exclusivityEndDate">Data de Término</label>
+                <input type="date" id="exclusivityEndDate" name="exclusivityEndDate">
+            </div>
+            <div class="form-group">
+                <label for="hasPromotion">Possui Promoção?</label>
+                <input type="checkbox" id="hasPromotion" name="hasPromotion">
+            </div>
+
+            <h2>Detalhes Adicionais</h2>
+            <div class="form-group">
+                <label for="differentials">Diferenciais</label>
+                <textarea id="differentials" name="differentials"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="landmarks">Pontos de Referência</label>
+                <textarea id="landmarks" name="landmarks"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="generalObservations">Observações Gerais</label>
+                <textarea id="generalObservations" name="generalObservations"></textarea>
+            </div>
+
             <div class="form-group">
                 <label for="images">Imagens</label>
                 <input type="file" id="images" name="images" multiple accept="image/*" required>
                 <div id="image-preview"></div>
             </div>
+
+            <div class="form-group">
+                <label for="title">Título da Propriedade</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição da Propriedade</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+
             <button type="submit" class="submit-btn">Adicionar Propriedade</button>
         </form>
     </main>

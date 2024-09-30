@@ -19,7 +19,12 @@
     <main class="property-form">
         <h1>Editar Propriedade</h1>
         <form id="edit-property-form">
-            <!-- Campos do formulário serão preenchidos dinamicamente -->
+            <!-- O conteúdo do formulário será preenchido dinamicamente pelo JavaScript -->
+            <div class="form-group">
+                <label for="images">Imagens</label>
+                <input type="file" id="images" name="images" multiple accept="image/*">
+                <div id="image-preview" class="image-preview-container"></div>
+            </div>
         </form>
     </main>
 

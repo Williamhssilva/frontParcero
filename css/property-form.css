@@ -86,3 +86,42 @@ select {
 .toast.show {
     opacity: 1;
 }
+
+.property-image {
+    width: 100px;  /* Ajuste conforme necessário */
+    height: 100px; /* Ajuste conforme necessário */
+    overflow: hidden;
+    margin: 5px;
+    position: relative;
+    display: inline-block;
+}
+
+.property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Isso garante que a imagem cubra todo o espaço sem distorção */
+}
+
+.property-image .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}

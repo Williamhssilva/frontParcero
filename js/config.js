@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://immediate-zesty-place.glitch.me'; // Ajuste conforme necessário
+export const API_BASE_URL = 'https://storm-fourth-suede.glitch.me'; // Ajuste conforme necessário

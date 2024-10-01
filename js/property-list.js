@@ -40,6 +40,7 @@ function displayProperties(properties) {
         `;
         propertyList.appendChild(propertyElement);
     });
+    setupEventListeners();
 }
 
 function setupEventListeners() {
@@ -52,7 +53,7 @@ function showAddPropertyForm() {
     alert('Funcionalidade de adicionar propriedade será implementada em breve!');
 }
 
-function handlePropertyAction(event) {
+window.handlePropertyAction = function handlePropertyAction(event) {
     if (event.target.classList.contains('edit-btn')) {
         const propertyId = event.target.getAttribute('data-id');
         editProperty(propertyId);
@@ -62,12 +63,12 @@ function handlePropertyAction(event) {
     }
 }
 
-function editProperty(propertyId) {
+window.editProperty = function editProperty(propertyId) {
     // Implementar lógica para editar propriedade
-    alert(`Funcionalidade de editar propriedade ${propertyId} será implementada em breve!`);
+    window.location.href = `edit-property.html?id=${propertyId}`;
 }
 
-async function deleteProperty(propertyId) {
+window.deleteProperty = async function deleteProperty(propertyId) {
     if (confirm('Tem certeza que deseja excluir esta propriedade?')) {
         try {
             const token = localStorage.getItem('token');

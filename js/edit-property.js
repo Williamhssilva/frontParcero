@@ -3,7 +3,6 @@ import { getCurrentUser, checkPermission } from './auth.js';
 import { renderMenu } from './menu.js';
 
 let currentProperty = null;
-let imagesToRemove = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     checkPermission(['corretor', 'administrador']);
@@ -231,17 +230,25 @@ function generateImageHtml(images) {
 
     return images.map((image, index) => `
         <div class="property-image" data-image="${image}">
-            <img src="${API_BASE_URL}/uploads/${image}" alt="Imagem ${index + 1}">
+            <img src="${API_BASE_URL}${image}" alt="Imagem ${index + 1}" onerror="this.onerror=null;this.src='https://placehold.co/600x400?text=Imagem+não+encontrada';">
             <button type="button" class="remove-image" onclick="removeImage('${image}')">X</button>
         </div>
     `).join('');
 }
 
-function removeImage(imageName) {
-    const imageElement = document.querySelector(`.property-image[data-image="${imageName}"]`);
-    if (imageElement) {
-        imageElement.remove();
-        imagesToRemove.push(imageName);
+function removeImage(imageUrl) {
+    if (confirm('Tem certeza que deseja remover esta imagem?')) {
+        // Remove a imagem do array currentProperty.images
+        currentProperty.images = currentProperty.images.filter(img => img !== imageUrl);
+        
+        // Atualiza a visualização das imagens
+        document.querySelector('.property-images').innerHTML = generateImageHtml(currentProperty.images);
+        
+        // Adiciona a imagem removida a um array de imagens para deletar
+        if (!currentProperty.imagesToDelete) {
+            currentProperty.imagesToDelete = [];
+        }
+        currentProperty.imagesToDelete.push(imageUrl);
     }
 }
 
@@ -259,13 +266,15 @@ async function handleEditSubmit(event) {
 
     // Adicionar as imagens existentes ao FormData
     currentProperty.images.forEach((image, index) => {
-        if (!imagesToRemove.includes(image)) {
-            formData.append(`existingImages[${index}]`, image);
-        }
+        formData.append(`existingImages[${index}]`, image);
     });
 
-    // Adicionar a lista de imagens a serem removidas
-    formData.append('imagesToRemove', JSON.stringify(imagesToRemove));
+    // Adicionar as imagens para deletar ao FormData
+    if (currentProperty.imagesToDelete) {
+        currentProperty.imagesToDelete.forEach((image, index) => {
+            formData.append(`imagesToDelete[${index}]`, image);
+        });
+    }
 
     const imageFiles = form.images.files;
     if (imageFiles.length > 10) {  // Ajuste este número conforme o limite definido no backend

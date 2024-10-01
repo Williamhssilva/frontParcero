@@ -174,14 +174,14 @@ function createPropertyCard(property) {
     const card = document.createElement('div');
     card.className = 'property-card';
     
-    // Usar a primeira imagem da propriedade, se disponível, ou uma imagem placeholder
+    // Corrigir o caminho da imagem
     const imageUrl = property.images && property.images.length > 0 
-        ? property.images[0] 
+        ? `${API_BASE_URL}${property.images[0]}` // Adiciona o API_BASE_URL ao caminho da imagem
         : 'https://via.placeholder.com/300x200.png?text=Imóvel';
     
     card.innerHTML = `
         <div class="property-image-container">
-            <img src="${imageUrl}" alt="${property.title}" class="property-image">
+            <img src="${imageUrl}" alt="${property.title}" class="property-image" onerror="this.src='https://via.placeholder.com/300x200.png?text=Imagem+não+encontrada'">
             <div class="property-overlay">
                 <button class="btn-action btn-view" data-id="${property._id}" title="Ver Detalhes">
                     <i class="fas fa-eye"></i>

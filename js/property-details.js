@@ -157,8 +157,19 @@ function updatePropertyImages(images) {
     galleryThumbs.innerHTML = '';
 
     images.forEach(image => {
-        galleryTop.innerHTML += `<div class="swiper-slide"><img src="${image}" alt="Imagem da propriedade"></div>`;
-        galleryThumbs.innerHTML += `<div class="swiper-slide"><img src="${image}" alt="Miniatura da imagem"></div>`;
+        const fullImageUrl = `${API_BASE_URL}${image}`; // Use API_BASE_URL aqui
+        
+        galleryTop.innerHTML += `
+            <div class="swiper-slide">
+                <img src="${fullImageUrl}" alt="Imagem da propriedade" onerror="this.src='https://via.placeholder.com/800x600?text=Imagem+não+encontrada';">
+            </div>
+        `;
+        
+        galleryThumbs.innerHTML += `
+            <div class="swiper-slide">
+                <img src="${fullImageUrl}" alt="Miniatura da imagem" onerror="this.src='https://via.placeholder.com/200x150?text=Miniatura+não+encontrada';">
+            </div>
+        `;
     });
 
     initializeCarousel();

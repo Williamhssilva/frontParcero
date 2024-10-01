@@ -92,45 +92,91 @@ function displayProperties(page) {
 function createPropertyCard(property) {
     const card = document.createElement('div');
     card.className = 'property-card';
+    card.setAttribute('data-id', property._id);
+
+    const images = property.images && property.images.length > 0
+        ? property.images
+        : ['https://placehold.co/600x400?text=Imagem+não+encontrada'];
+
     card.innerHTML = `
-        <div class="property-image-container">
-            <img src="${property.images && property.images.length > 0 ? property.images[0] : 'https://via.placeholder.com/300x200.png?text=Imóvel'}" alt="${property.title}" class="property-image">
-            <div class="property-overlay">
-                <button class="btn-action btn-view" data-id="${property._id}" title="Ver Detalhes">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <a href="edit-property.html?id=${property._id}" class="btn-action btn-edit" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <button class="btn-action btn-delete" data-id="${property._id}" title="Excluir">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
+        <div class="property-image" style="background-image: url('${API_BASE_URL}${images[0]}');">
+            ${images.length > 1 ? `
+                <div class="image-navigation">
+                    <button class="prev-image">&lt;</button>
+                    <span class="image-counter">1/${images.length}</span>
+                    <button class="next-image">&gt;</button>
+                </div>
+            ` : ''}
         </div>
-        <div class="property-info">
-            <h3 class="property-title">${property.title}</h3>
-            <p class="property-address">${property.address}, ${property.neighborhood}, ${property.captureCity}</p>
-            <p class="property-price">R$ ${property.salePrice ? property.salePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'Preço não informado'}</p>
-            <p class="property-details">${property.bedrooms || 0} quartos | ${property.totalArea || 0} m²</p>
-            <p class="property-status">Status: ${property.status || 'Não informado'}</p>
+        <h3 class="property-title">${property.title}</h3>
+        <p class="property-price">R$ ${property.salePrice.toLocaleString('pt-BR')}</p>
+        <p class="property-address">${property.address}, ${property.neighborhood}</p>
+        <p class="property-details">${property.bedrooms} quartos | ${property.totalArea} m²</p>
+        <div class="property-actions">
+            <button class="action-btn view-btn" data-id="${property._id}">
+                <i class="fas fa-eye"></i> Visualizar
+            </button>
+            <button class="action-btn edit-btn" data-id="${property._id}">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="action-btn delete-btn" data-id="${property._id}">
+                <i class="fas fa-trash-alt"></i> Excluir
+            </button>
         </div>
     `;
+
+    if (images.length > 1) {
+        let currentImageIndex = 0;
+        const imageElement = card.querySelector('.property-image');
+        const prevButton = card.querySelector('.prev-image');
+        const nextButton = card.querySelector('.next-image');
+        const imageCounter = card.querySelector('.image-counter');
+
+        prevButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+            updateImage();
+        });
+
+        nextButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            updateImage();
+        });
+
+        function updateImage() {
+            imageElement.style.backgroundImage = `url('${API_BASE_URL}${images[currentImageIndex]}')`;
+            imageCounter.textContent = `${currentImageIndex + 1}/${images.length}`;
+        }
+    }
+
     return card;
 }
 
 function setupEventListeners() {
-    const viewButtons = document.querySelectorAll('.btn-view');
+    const viewButtons = document.querySelectorAll('.view-btn');
     viewButtons.forEach(button => {
-        button.addEventListener('click', () => showPropertyDetails(button.getAttribute('data-id')));
+        button.addEventListener('click', function() {
+            const propertyId = this.getAttribute('data-id');
+            showPropertyDetails(propertyId);
+        });
     });
 
-    const deleteButtons = document.querySelectorAll('.btn-delete');
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const propertyId = button.getAttribute('data-id');
+            window.location.href = `edit-property.html?id=${propertyId}`;
+        });
+    });
+
+    const deleteButtons = document.querySelectorAll('.delete-btn');
     deleteButtons.forEach(button => {
         button.addEventListener('click', deleteProperty);
     });
 }
 
-async function showPropertyDetails(propertyId) {
+window.showPropertyDetails = async function showPropertyDetails(propertyId) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
             headers: {
@@ -171,7 +217,7 @@ async function showPropertyDetails(propertyId) {
                     <div class="swiper-wrapper">
                         ${images.map(img => `
                             <div class="swiper-slide">
-                                <img src="${img}" alt="Imagem da propriedade">
+                                <img src="${API_BASE_URL}${img}" alt="Imagem da propriedade" onerror="this.src='https://via.placeholder.com/800x600.png?text=Imagem+não+encontrada'">
                             </div>
                         `).join('')}
                     </div>
@@ -182,7 +228,7 @@ async function showPropertyDetails(propertyId) {
                     <div class="swiper-wrapper">
                         ${images.map(img => `
                             <div class="swiper-slide">
-                                <img src="${img}" alt="Miniatura da imagem">
+                                <img src="${API_BASE_URL}${img}" alt="Miniatura da imagem" onerror="this.src='https://via.placeholder.com/200x150.png?text=Miniatura+não+encontrada'">
                             </div>
                         `).join('')}
                     </div>
@@ -242,7 +288,15 @@ async function showPropertyDetails(propertyId) {
         ])}
                 </div>
                 <div class="property-additional-info">
-                    <h3>Detalhes Adicionais</h3>
+                    <h3>Informações Adicionais</h3>
+                    <p><strong>Captado por:</strong> ${property.capturedBy || 'Não informado'}</p>
+                    <p><strong>Data de captação:</strong> ${property.captureDate ? new Date(property.captureDate).toLocaleDateString('pt-BR') : 'Não informada'}</p>
+                    <p><strong>Área construída:</strong> ${property.builtArea || 0} m²</p>
+                    <p><strong>Suítes:</strong> ${property.suites || 0}</p>
+                    <p><strong>Banheiros sociais:</strong> ${property.socialBathrooms || 0}</p>
+                    <p><strong>Status de ocupação:</strong> ${property.occupancyStatus || 'Não informado'}</p>
+                    <p><strong>Nome do proprietário:</strong> ${property.ownerName || 'Não informado'}</p>
+                    <p><strong>Contato do proprietário:</strong> ${property.ownerContact || 'Não informado'}</p>
                     <p><strong>Diferenciais:</strong> ${property.differentials || 'Não informado'}</p>
                     <p><strong>Pontos de referência:</strong> ${property.landmarks || 'Não informado'}</p>
                     <p><strong>Observações gerais:</strong> ${property.generalObservations || 'Não informado'}</p>

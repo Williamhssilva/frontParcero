@@ -16,10 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupForm() {
     console.log('Configurando formulário');
     const form = document.getElementById('add-property-form');
+    console.log("Formulário encontrado:", form);
+    
     if (form) {
         form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio tradicional do formulário
             console.log('Formulário submetido');
-            event.preventDefault();
             handleSubmit(event);
         });
     } else {
@@ -50,19 +52,23 @@ function setupImagePreview() {
 }
 
 async function handleSubmit(event) {
-    console.log('Form submission started');
     event.preventDefault();
     const form = event.target;
-    
-    if (!validateForm(form)) {
-        return;
-    }
-
     const formData = new FormData(form);
+
+    // Adicionar o ID do corretor atual
+    formData.append('capturedBy', getCurrentUser().id);
+
+    // Converter checkbox para booleano
+    formData.set('isCondominium', form.isCondominium.checked);
+    formData.set('hasBackyard', form.hasBackyard.checked);
+    formData.set('hasBalcony', form.hasBalcony.checked);
+    formData.set('hasElevator', form.hasElevator.checked);
+    formData.set('hasPromotion', form.hasPromotion.checked);
 
     try {
         showLoading();
-        console.log('Sending request to server');
+        console.log('Enviando requisição para o servidor');
         const response = await fetch(`${API_BASE_URL}/api/properties`, {
             method: 'POST',
             headers: {
@@ -71,9 +77,9 @@ async function handleSubmit(event) {
             body: formData
         });
 
-        console.log('Response received:', response.status);
+        console.log('Resposta recebida:', response.status);
         const data = await response.json();
-        console.log('Response data:', data);
+        console.log('Dados da resposta:', data);
 
         if (!response.ok) {
             throw new Error(data.message || 'Falha ao adicionar propriedade');
@@ -83,7 +89,7 @@ async function handleSubmit(event) {
         form.reset(); // Limpa o formulário após o sucesso
     } catch (error) {
         console.error('Erro ao adicionar propriedade:', error);
-        showNotification('Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
+        showNotification(`Erro ao adicionar propriedade: ${error.message}`, 'error');
     } finally {
         hideLoading();
     }
@@ -159,4 +165,7 @@ function showNotification(message, type = 'info') {
             document.body.removeChild(notification);
         }, 300);
     }, 5000);
+
+    // Adicione este console.log para garantir que a mensagem seja exibida no console
+    console.log(`Notificação: ${type} - ${message}`);
 }

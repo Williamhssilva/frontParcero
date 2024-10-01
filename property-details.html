@@ -39,7 +39,9 @@
         <div class="property-info">
             <div class="property-main-info">
                 <div id="property-price" class="price"></div>
-                <div id="property-features" class="features"></div>
+                <div id="property-features" class="features">
+                    <!-- Características serão inseridas aqui dinamicamente -->
+                </div>
             </div>
             <div class="property-description">
                 <h2>Descrição</h2>
@@ -47,15 +49,24 @@
             </div>
             <div class="property-details">
                 <h2>Detalhes</h2>
-                <ul id="property-details-list"></ul>
+                <ul id="property-details-list">
+                    <!-- Detalhes serão inseridos aqui dinamicamente -->
+                </ul>
             </div>
             <div class="property-actions">
-                <button id="request-visit-btn" class="btn btn-primary">Solicitar Visita</button>
-                <button id="favorite-btn" class="btn btn-secondary">Favoritar</button>
+                <button id="request-visit-btn" class="btn btn-primary">
+                    <i class="fas fa-calendar-alt"></i> Solicitar Visita
+                </button>
+                <button id="favorite-btn" class="btn btn-secondary">
+                    <i class="far fa-heart"></i> Favoritar
+                </button>
             </div>
         </div>
         <div id="similar-properties" class="similar-properties">
-            <!-- Imóveis semelhantes serão inseridos aqui dinamicamente -->
+            <h2>Imóveis Semelhantes</h2>
+            <div class="properties-grid">
+                <!-- Imóveis semelhantes serão inseridos aqui dinamicamente -->
+            </div>
         </div>
     </main>
 

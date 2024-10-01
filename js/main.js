@@ -167,24 +167,21 @@ function displayProperties(properties) {
         const propertyCard = createPropertyCard(property);
         propertyGrid.appendChild(propertyCard);
     });
-    setupLazyLoading();
-    setupPropertyCardListeners(); // Adicione esta linha
+    setupPropertyCardListeners();
 }
 
 function createPropertyCard(property) {
     const card = document.createElement('div');
-    card.className = 'property-card' + (property.featured ? ' featured' : '');
+    card.className = 'property-card';
     
-    // Usar 3 imagens de overlay para cada imóvel
-    const overlayImages = [
-        'https://via.placeholder.com/800x600.png?text=Imagem+1',
-        'https://via.placeholder.com/800x600.png?text=Imagem+2',
-        'https://via.placeholder.com/800x600.png?text=Imagem+3'
-    ];
+    // Corrigir o caminho da imagem
+    const imageUrl = property.images && property.images.length > 0 
+        ? `${API_BASE_URL}${property.images[0]}` // Adiciona o API_BASE_URL ao caminho da imagem
+        : 'https://via.placeholder.com/300x200.png?text=Imóvel';
     
     card.innerHTML = `
         <div class="property-image-container">
-            <img src="${overlayImages[0]}" alt="${property.title}" class="property-image">
+            <img src="${imageUrl}" alt="${property.title}" class="property-image" onerror="this.src='https://via.placeholder.com/300x200.png?text=Imagem+não+encontrada'">
             <div class="property-overlay">
                 <button class="btn-action btn-view" data-id="${property._id}" title="Ver Detalhes">
                     <i class="fas fa-eye"></i>
@@ -199,12 +196,12 @@ function createPropertyCard(property) {
         </div>
         <div class="property-info">
             <h3>${property.title}</h3>
-            <p class="price">R$ ${property.price.toLocaleString('pt-BR')}</p>
-            <p class="address">${property.address.street}, ${property.address.city} - ${property.address.state}</p>
+            <p class="price">R$ ${property.salePrice ? property.salePrice.toLocaleString('pt-BR') : 'Preço não informado'}</p>
+            <p class="address">${property.address}, ${property.neighborhood}, ${property.captureCity}</p>
             <p class="details">
-                <span>${property.bedrooms} quartos</span> | 
-                <span>${property.bathrooms} banheiros</span> | 
-                <span>${property.area} m²</span>
+                <span>${property.bedrooms || 0} quartos</span> | 
+                <span>${property.bathrooms || 0} banheiros</span> | 
+                <span>${property.totalArea || 0} m²</span>
             </p>
         </div>
     `;

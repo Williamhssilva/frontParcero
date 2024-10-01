@@ -19,7 +19,12 @@
     <main class="property-form">
         <h1>Editar Propriedade</h1>
         <form id="edit-property-form">
-            <!-- O conteúdo do formulário será o mesmo que o de add-property.html -->
+            <!-- O conteúdo do formulário será preenchido dinamicamente pelo JavaScript -->
+            <div class="form-group">
+                <label for="images">Imagens</label>
+                <input type="file" id="images" name="images" multiple accept="image/*">
+                <div id="image-preview" class="image-preview-container"></div>
+            </div>
         </form>
     </main>
 
@@ -27,10 +32,9 @@
         <!-- O menu será preenchido dinamicamente pelo JavaScript -->
     </nav>
 
-    <script type="module" src="js/main.js"></script>
-    <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/config.js"></script>
     <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/edit-property.js"></script>
 </body>
 </html>

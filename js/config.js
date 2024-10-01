@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'http://localhost:5000'; // Ajuste conforme necessário
+export const API_BASE_URL = 'https://immediate-zesty-place.glitch.me/api'; // Ajuste conforme necessário

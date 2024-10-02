@@ -11,7 +11,7 @@ Este é o frontend do sistema Parcero Imóveis, uma plataforma para gerenciament
 
 1. Clone o repositório:
    ```
-   git clone https://github.com/seu-usuario/frontParcero.git
+   git clone https://github.com/Williamhssilva/frontParcero.git
    cd frontParcero
    ```
 

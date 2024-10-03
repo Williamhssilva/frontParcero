@@ -18,14 +18,14 @@ async function loadAgentDashboard() {
         }
 
         const data = await response.json();
-        updateDashboardUI(data.data);
+        updateDashboardUIagn(data.data);
     } catch (error) {
         console.error('Erro ao carregar o dashboard:', error);
         alert('Erro ao carregar o dashboard. Por favor, tente novamente mais tarde.');
     }
 }
 
-function updateDashboardUI(dashboardData) {
+function updateDashboardUIagn(dashboardData) {
     document.getElementById('total-properties').textContent = dashboardData.totalProperties;
     document.getElementById('active-properties').textContent = dashboardData.activeProperties;
     document.getElementById('sold-properties').textContent = dashboardData.soldProperties;

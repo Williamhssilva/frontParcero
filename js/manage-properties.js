@@ -1,6 +1,7 @@
 import { API_BASE_URL } from './config.js';
 import { getCurrentUser, checkPermission } from './auth.js';
 import { renderMenu } from './menu.js';
+import { authenticatedFetch } from './utils.js';
 
 let currentPage = 1;
 const limit = 12; // Número de itens por página
@@ -39,11 +40,19 @@ function debounce(func, wait) {
 
 async function loadAllProperties() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/properties?agent=${getCurrentUser().id}&limit=1000`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+        if (!checkPermission(['corretor', 'administrador'])) {
+            return; // A função checkPermission já lida com o redirecionamento
+        }
+
+        const currentUser = getCurrentUser();
+        const token = localStorage.getItem('token');
+        let url = `${API_BASE_URL}/api/properties?limit=1000`;
+
+        if (currentUser.role === 'corretor') {
+            url += `&agent=${currentUser.id}`;
+        }
+
+        const response = await authenticatedFetch(url);
 
         if (!response.ok) {
             throw new Error('Falha ao carregar propriedades');
@@ -51,12 +60,12 @@ async function loadAllProperties() {
 
         const data = await response.json();
         allProperties = data.data.properties;
-        filteredProperties = allProperties;
+        filteredProperties = [...allProperties];
         displayProperties(currentPage);
         updatePagination(currentPage, Math.ceil(filteredProperties.length / limit));
     } catch (error) {
         console.error('Erro ao carregar propriedades:', error);
-        showNotification('Erro ao carregar propriedades. Por favor, tente novamente mais tarde.', 'error');
+        showNotification('Erro ao carregar propriedades. Por favor, tente novamente.', 'error');
     }
 }
 

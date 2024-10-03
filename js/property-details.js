@@ -1,5 +1,6 @@
 import { API_BASE_URL } from './config.js';
 import { renderMenu } from './menu.js';
+import { authenticatedFetch } from './utils.js';
 
 let galleryTop;
 let galleryThumbs;
@@ -35,7 +36,7 @@ async function fetchPropertyDetails(propertyId) {
         const url = `${API_BASE_URL}/api/properties/${propertyId}`;
         console.log('URL da requisição:', url);
         
-        const response = await fetch(url);
+        const response = await authenticatedFetch(url);
         console.log('Status da resposta:', response.status);
         
         if (!response.ok) {
@@ -206,7 +207,7 @@ function initializeCarousel() {
 
 async function loadSimilarProperties(property) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/properties/${property._id}/similar`);
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties/${property._id}/similar`);
         if (!response.ok) {
             throw new Error('Falha ao carregar propriedades similares');
         }

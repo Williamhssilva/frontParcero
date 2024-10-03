@@ -1,6 +1,7 @@
 import { API_BASE_URL } from './config.js';
 import { renderMenu } from './menu.js';
 import { getCurrentUser, checkPermission, logout } from './auth.js';
+import { authenticatedFetch } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded iniciado');
@@ -34,13 +35,7 @@ async function loadDashboardData() {
         console.log('Token encontrado');
 
         console.log('Iniciando fetch para', `${API_BASE_URL}/api/admin/dashboard`);
-        const response = await fetch(`${API_BASE_URL}/api/admin/dashboard`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/admin/dashboard`);
         console.log('Resposta recebida', response);
 
         if (!response.ok) {
@@ -69,12 +64,7 @@ async function loadDashboardData() {
 
 async function loadPendingAgents() {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/users/pending-agents`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/pending-agents`);
         const result = await response.json();
         console.log('Dados recebidos de pending-agents:', result);
         if (response.ok && result.status === 'success') {
@@ -118,12 +108,8 @@ function displayPendingAgents(agents) {
 
 window.approveAgent = async function(agentId) {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/users/approve-agent/${agentId}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/approve-agent/${agentId}`, {
+            method: 'PATCH'
         });
         const result = await response.json();
         if (response.ok && result.status === 'success') {
@@ -141,12 +127,153 @@ window.approveAgent = async function(agentId) {
 
 window.rejectAgent = async function(agentId) {
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE_URL}/api/users/reject-agent/${agentId}`, {
-            method: 'PATCH',
-            headers: {
-                'Authorization': `Bearer ${token}`
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/reject-agent/${agentId}`, {
+            method: 'PATCH'
+        });
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+            alert('Corretor recusado com sucesso');
+            loadPendingAgents();
+            loadDashboardData();
+        } else {
+            throw new Error(result.message || 'Erro ao recusar corretor');
+        }
+    } catch (error) {
+        console.error('Erro ao recusar corretor:', error);
+        alert('Erro ao recusar corretor');
+    }
+};
+
+function updateDashboardUI(dashboardData) {
+    if (dashboardData.totalProperties !== undefined) {
+        document.querySelector('#total-properties .dashboard-number').textContent = dashboardData.totalProperties;
+    }
+    if (dashboardData.totalLeads !== undefined) {
+        document.querySelector('#total-leads .dashboard-number').textContent = dashboardData.totalLeads;
+    }
+    if (dashboardData.totalAgents !== undefined) {
+        document.querySelector('#total-agents .dashboard-number').textContent = dashboardData.totalAgents;
+    }
+    if (dashboardData.pendingApprovals !== undefined) {
+        document.querySelector('#pending-approvals .dashboard-number').textContent = dashboardData.pendingApprovals;
+    }
+
+    if (dashboardData.propertiesByType) {
+        updatePropertiesChart(dashboardData.propertiesByType);
+    }
+    if (dashboardData.leadsByStatus) {
+        updateLeadsChart(dashboardData.leadsByStatus);
+    }
+    if (dashboardData.recentActivities) {
+        updateRecentActivities(dashboardData.recentActivities);
+    }
+}
+
+function updatePropertiesChart(propertiesByType) {
+    const canvas = document.getElementById('properties-chart');
+    if (!canvas) {
+        console.error('Elemento canvas "properties-chart" não encontrado');
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    // Verifique se já existe um gráfico neste canvas
+    if (window.propertiesChart instanceof Chart) {
+        window.propertiesChart.destroy();
+    }
+
+    window.propertiesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(propertiesByType),
+            datasets: [{
+                data: Object.values(propertiesByType),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: 'Propriedades por Tipo'
             }
+        }
+    });
+}
+
+function updateLeadsChart(leadsByStatus) {
+    const canvas = document.getElementById('leads-chart');
+    if (!canvas) {
+        console.error('Elemento canvas "leads-chart" não encontrado');
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    // Verifique se já existe um gráfico neste canvas
+    if (window.leadsChart instanceof Chart) {
+        window.leadsChart.destroy();
+    }
+
+    window.leadsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(leadsByStatus),
+            datasets: [{
+                label: 'Leads por Status',
+                data: Object.values(leadsByStatus),
+                backgroundColor: 'rgba(75, 192, 192, 0.8)',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateRecentActivities(activities) {
+    const recentActivitiesList = document.getElementById('recent-activities-list');
+    recentActivitiesList.innerHTML = '';
+    activities.forEach(activity => {
+        const li = document.createElement('li');
+        li.textContent = `${activity.user} ${activity.action} ${activity.target} em ${new Date(activity.date).toLocaleString()}`;
+        recentActivitiesList.appendChild(li);
+    });
+}
+
+window.approveAgent = async function(agentId) {
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/approve-agent/${agentId}`, {
+            method: 'PATCH'
+        });
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+            alert('Corretor aprovado com sucesso');
+            loadPendingAgents();
+            loadDashboardData();
+        } else {
+            throw new Error(result.message || 'Erro ao aprovar corretor');
+        }
+    } catch (error) {
+        console.error('Erro ao aprovar corretor:', error);
+        alert('Erro ao aprovar corretor');
+    }
+};
+
+window.rejectAgent = async function(agentId) {
+    try {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/reject-agent/${agentId}`, {
+            method: 'PATCH'
         });
         const result = await response.json();
         if (response.ok && result.status === 'success') {

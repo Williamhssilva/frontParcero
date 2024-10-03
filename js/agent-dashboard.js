@@ -1,6 +1,7 @@
 import { API_BASE_URL } from './config.js';
 import { getCurrentUser, checkPermission } from './auth.js';
 import { renderMenu } from './menu.js';
+import { authenticatedFetch } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     if (checkPermission(['corretor', 'administrador'])) {
@@ -10,11 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadAgentDashboard() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/properties/agent/dashboard`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties/agent/dashboard`);
 
         if (!response.ok) {
             throw new Error('Falha ao carregar o dashboard');

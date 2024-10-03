@@ -2,6 +2,7 @@ import { API_BASE_URL } from './config.js';
 import { renderMenu } from './menu.js';
 import { getCurrentUser, logout } from './auth.js';
 import { initPropertyDetails } from './property-details.js';
+import { authenticatedFetch } from './utils.js';
 
 let currentPage = 1;
 const limit = 12; // Número de itens por página
@@ -58,9 +59,10 @@ async function searchProperties(page = 1) {
 
     console.log('Query params:', queryParams.toString());
 
+    const token = localStorage.getItem('token');
     try {
-        console.log('Fazendo requisição para:', `${API_BASE_URL}/api/properties?${queryParams}`);
-        const response = await fetch(`${API_BASE_URL}/api/properties?${queryParams}`);
+        console.log("entreiiiidinovo");
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties?${queryParams}`);
         console.log('Resposta completa:', response);
         
         if (!response.ok) {
@@ -109,10 +111,9 @@ function updatePagination(currentPage, totalPages, pageChangeCallback) {
     }
 }
 
-async function loadFeaturedProperties(page = 1) {
+async function loadFeaturedProperties() {
     try {
-        // Remova a linha de console.log aqui
-        const response = await fetch(`${API_BASE_URL}/api/properties?page=${page}&limit=12`);
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties?page=1&limit=12`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -128,7 +129,10 @@ async function loadFeaturedProperties(page = 1) {
         }
     } catch (error) {
         console.error('Erro ao carregar imóveis:', error);
-        document.getElementById('property-grid').innerHTML = '<p>Erro ao carregar imóveis. Por favor, tente novamente mais tarde.</p>';
+        if (error.message === 'Não autorizado' || error.message === 'Usuário não autenticado') {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
     }
 }
 
@@ -258,3 +262,9 @@ function setupPropertyCardListeners() {
         });
     });
 }
+
+window.addEventListener('storage', function(e) {
+    if (e.key === 'token') {
+        console.log('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXToken alterado:', e.newValue);
+    }
+});

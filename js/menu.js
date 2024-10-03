@@ -54,6 +54,7 @@ function addEventListeners() {
     if (logoutButton) {
         logoutButton.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log('Botão de logout clicado');
             logout();
         });
     }

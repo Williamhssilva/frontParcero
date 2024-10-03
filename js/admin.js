@@ -9,17 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function loadPendingAgents() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Usuário não autenticado. Redirecionando para login.');
+        window.location.href = 'login.html';
+        return;
+    }
     try {
         console.log('Iniciando loadPendingAgents');
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Token não encontrado');
-        }
-
-        console.log('Token:', token);
-        console.log('API_BASE_URL:', API_BASE_URL);
-
-        console.log('Fazendo requisição para:', `${API_BASE_URL}/api/users/pending-agents`);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
             console.log('Timeout atingido, abortando requisição');

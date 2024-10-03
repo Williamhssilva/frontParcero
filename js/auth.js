@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './config.js';
-import { renderMenu } from './menu.js';  // Remova updateMenu daqui
+import { renderMenu } from './menu.js';  
 
 // auth.js
 export async function login(email, password) {
@@ -19,8 +19,9 @@ export async function login(email, password) {
         if (response.ok) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.data.user));
+            console.log('Token armazenado:', data.token); 
             console.log('Login bem-sucedido, atualizando menu');
-            renderMenu();  // Use apenas renderMenu aqui
+            renderMenu();
             window.location.href = 'index.html';
         } else {
             throw new Error(data.message || 'Erro ao fazer login');
@@ -49,7 +50,7 @@ export async function register(name, email, password, role) {
         
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.data.user));
-        renderMenu(); // Adicione esta linha
+        renderMenu(); 
         window.location.href = 'index.html';
     } catch (error) {
         console.error('Erro:', error);
@@ -75,6 +76,17 @@ export function getCurrentUser() {
 
 export function isLoggedIn() {
     return !!localStorage.getItem('token');
+}
+
+export function isTokenValid() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token não encontrado no localStorage');
+        return false;
+    }
+    console.log('Token encontrado:', token);
+    // Aqui você pode adicionar uma verificação adicional, como decodificar o JWT
+    return true;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -126,7 +138,7 @@ function updateAuthUI() {
     }
 }
 
-// Adicione esta função para verificar permissões
+// função para verificar permissões
 export function checkPermission(allowedRoles) {
     const user = getCurrentUser();
     if (!user) {

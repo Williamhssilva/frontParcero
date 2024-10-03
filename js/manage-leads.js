@@ -113,7 +113,7 @@ async function loadLeads() {
         const data = await response.json();
         console.log('Dados recebidos:', data);
         if (response.ok) {
-            allLeads = data.data; // Armazena todos os leads
+            allLeads = data.data;
             displayLeadsInFunnel(allLeads);
         } else {
             console.error('Erro ao carregar leads:', data.error);

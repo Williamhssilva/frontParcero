@@ -3,10 +3,10 @@ function getApiBaseUrl() {
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
         return 'http://localhost:5000';
     } else if (hostname.includes('github.io')) {
-        return 'https://parcero-awz4.onrender.com'; // Substitua pela URL real do seu backend no Glitch
+        return 'https://abiding-bedecked-dingo.glitch.me'; // Substitua pela URL real do seu backend no Glitch
     } else {
         // Para outros ambientes (como o Glitch), use a URL do backend no Glitch
-        return 'https://parcero-awz4.onrender.com'; // Substitua pela URL real do seu backend no Glitch
+        return 'https://abiding-bedecked-dingo.glitch.me'; // Substitua pela URL real do seu backend no Glitch
     }
 }
 

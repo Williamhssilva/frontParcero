@@ -120,7 +120,7 @@ function createPropertyCard(property) {
         <h3 class="property-title">${property.title}</h3>
         <p class="property-price">R$ ${property.salePrice.toLocaleString('pt-BR')}</p>
         <p class="property-address">${property.address}, ${property.neighborhood}</p>
-        <p class="property-details">${property.bedrooms} quartos | ${property.totalArea} m²</p>
+        <p class="property-details">${property.bedrooms} quartos | ${property.totalArea} m² | ${property.garages || 0} vagas</p>
         <div class="property-actions">
             <button class="action-btn view-btn" data-id="${property._id}">
                 <i class="fas fa-eye"></i> Visualizar
@@ -249,7 +249,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                     <div class="property-features">
                         <span><i class="fas fa-home"></i> ${property.propertyType || 'Tipo não informado'}</span>
                         <span><i class="fas fa-bed"></i> ${property.bedrooms || 0} quartos</span>
-                        <span><i class="fas fa-bath"></i> ${property.bathrooms || 0} banheiros</span>
+                        <span><i class="fas fa-bath"></i> ${property.socialBathrooms || 0} banheiros</span>
                         <span><i class="fas fa-ruler-combined"></i> ${property.totalArea || 0} m² total</span>
                     </div>
                 </div>
@@ -276,6 +276,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
             ['Tipo secundário', property.secondaryType],
             ['Área total', `${property.totalArea || 0} m²`],
             ['Área construída', `${property.builtArea || 0} m²`],
+            ['Vagas', property.garages],
             ['Quartos', property.bedrooms],
             ['Suítes', property.suites],
             ['Banheiros sociais', property.socialBathrooms],
@@ -301,6 +302,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                     <p><strong>Captado por:</strong> ${property.capturedBy || 'Não informado'}</p>
                     <p><strong>Data de captação:</strong> ${property.captureDate ? new Date(property.captureDate).toLocaleDateString('pt-BR') : 'Não informada'}</p>
                     <p><strong>Área construída:</strong> ${property.builtArea || 0} m²</p>
+                    <p><strong>Vagas:</strong> ${property.garages || 0}</p>
                     <p><strong>Suítes:</strong> ${property.suites || 0}</p>
                     <p><strong>Banheiros sociais:</strong> ${property.socialBathrooms || 0}</p>
                     <p><strong>Status de ocupação:</strong> ${property.occupancyStatus || 'Não informado'}</p>

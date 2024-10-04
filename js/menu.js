@@ -15,21 +15,21 @@ export function renderMenu() {
     }
 
     let menuItems = [
-        createMenuItem('index.html', 'fas fa-home', 'Início'),
+        //createMenuItem('index.html', 'fas fa-home', 'Início'),
     ];
 
     if (user) {
         if (user.role === 'corretor' || user.role === 'administrador') {
             menuItems.push(createMenuItem('manage-properties.html', 'fas fa-building', 'Imóveis'));
             menuItems.push(createMenuItem('manage-leads.html', 'fas fa-user-friends', 'Leads'));
-            menuItems.push(createMenuItem('agent-dashboard.html', 'fas fa-chart-line', 'Dashboard'));
+            //menuItems.push(createMenuItem('agent-dashboard.html', 'fas fa-chart-line', 'Dashboard'));
         }
 
         if (user.role === 'administrador') {
-            menuItems.push(createMenuItem('admin-dashboard.html', 'fas fa-user-shield', 'Admin'));
+           //menuItems.push(createMenuItem('admin-dashboard.html', 'fas fa-user-shield', 'Admin'));
         }
 
-        menuItems.push(createMenuItem('#', 'far fa-user', 'Perfil'));
+        //menuItems.push(createMenuItem('#', 'far fa-user', 'Perfil'));
         menuItems.push(createMenuItem('#', 'fas fa-sign-out-alt', 'Sair', 'logout-button'));
     } else {
         menuItems.push(createMenuItem('login.html', 'fas fa-sign-in-alt', 'Login'));

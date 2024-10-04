@@ -31,6 +31,15 @@
                 <input type="text" id="captureCEP" name="captureCEP" required>
             </div>
 
+            <h2>Exibição da Propriedade</h2>
+            <div class="form-group">
+                <label for="title">Título da Propriedade</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição da Propriedade</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
             <h2>Localização do Imóvel</h2>
             <div class="form-group">
                 <label for="address">Endereço</label>
@@ -45,7 +54,7 @@
                 <input type="checkbox" id="isCondominium" name="isCondominium">
             </div>
             <div class="form-group">
-                <label for="block">Quadra</label>
+                <label for="block">Quadra/Bloco</label>
                 <input type="text" id="block" name="block">
             </div>
             <div class="form-group">
@@ -82,6 +91,10 @@
             </div>
 
             <h2>Tipologia do Imóvel</h2>
+            <div class="form-group">
+                <label for="garages">Vagas</label>
+                <input type="number" id="garages" name="garages" required>
+            </div>
             <div class="form-group">
                 <label for="bedrooms">Quartos</label>
                 <input type="number" id="bedrooms" name="bedrooms" required>
@@ -181,15 +194,6 @@
                 <div id="image-preview"></div>
             </div>
 
-            <div class="form-group">
-                <label for="title">Título da Propriedade</label>
-                <input type="text" id="title" name="title" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Descrição da Propriedade</label>
-                <textarea id="description" name="description" required></textarea>
-            </div>
-
             <button type="submit" class="submit-btn">Adicionar Propriedade</button>
         </form>
     </main>
@@ -202,7 +206,7 @@
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/add-property.js"></script>
-    
+
 </body>
 
 </html>

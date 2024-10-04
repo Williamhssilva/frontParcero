@@ -22,7 +22,7 @@ export async function login(email, password) {
             console.log('Token armazenado:', data.token); 
             console.log('Login bem-sucedido, atualizando menu');
             renderMenu();
-            window.location.href = 'index.html';
+            window.location.href = 'manage-properties.html';
         } else {
             throw new Error(data.message || 'Erro ao fazer login');
         }
@@ -51,7 +51,7 @@ export async function register(name, email, password, role) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.data.user));
         renderMenu(); 
-        window.location.href = 'index.html';
+        window.location.href = 'manage-properties.html';
     } catch (error) {
         console.error('Erro:', error);
         alert(error.message);
@@ -63,7 +63,7 @@ export function logout() {
     localStorage.removeItem('user');
     renderMenu();  // Use apenas renderMenu aqui
     // Redireciona para a página inicial
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
 }
 
 // Tornar a função logout disponível globalmente

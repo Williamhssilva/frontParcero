@@ -104,6 +104,10 @@ function populateForm(property) {
 
         <h2>Tipologia do Imóvel</h2>
         <div class="form-group">
+            <label for="garages">Vagas</label>
+            <input type="number" id="garages" name="garages" value="${property.garages || ''}" required>
+        </div>
+        <div class="form-group">
             <label for="bedrooms">Quartos</label>
             <input type="number" id="bedrooms" name="bedrooms" value="${property.bedrooms || ''}" required>
         </div>
@@ -266,6 +270,8 @@ async function handleEditSubmit(event) {
 
     // Adicionar as imagens existentes ao FormData
     currentProperty.images.forEach((image, index) => {
+        console.log('Adicionando imagem ao FormData:', image);
+        console.log('FormData:', index);
         formData.append(`existingImages[${index}]`, image);
     });
 

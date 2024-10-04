@@ -78,7 +78,7 @@ function displayPropertyDetails(property) {
         <div class="feature"><i class="fas fa-bath"></i> ${property.bathrooms || 0} banheiros</div>
         <div class="feature"><i class="fas fa-ruler-combined"></i> ${property.totalArea || 0} m² total</div>
         <div class="feature"><i class="fas fa-vector-square"></i> ${property.builtArea || 0} m² construídos</div>
-        <div class="feature"><i class="fas fa-car"></i> ${property.parkingSpaces || 0} vagas</div>
+        <div class="feature"><i class="fas fa-car"></i> ${property.garages || 0} vagas</div>
         <div class="feature"><i class="fas fa-building"></i> ${property.propertyType || 'Tipo não informado'}</div>
     `;
 
@@ -97,7 +97,7 @@ function displayPropertyDetails(property) {
                     <li><i class="fas fa-vector-square"></i> Área construída: ${property.builtArea || 0} m²</li>
                     <li><i class="fas fa-bed"></i> Quartos: ${property.bedrooms || 0}</li>
                     <li><i class="fas fa-bath"></i> Banheiros: ${property.bathrooms || 0}</li>
-                    <li><i class="fas fa-car"></i> Vagas: ${property.parkingSpaces || 0}</li>
+                    <li><i class="fas fa-car"></i> Vagas: ${property.garages || 0}</li>
                 </ul>
             </div>
             <div class="details-column">

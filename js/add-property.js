@@ -17,9 +17,9 @@ function setupForm() {
     console.log('Configurando formulário');
     const form = document.getElementById('add-property-form');
     console.log("Formulário encontrado:", form);
-    
+
     if (form) {
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', function (event) {
             event.preventDefault(); // Impede o envio tradicional do formulário
             console.log('Formulário submetido');
             handleSubmit(event);
@@ -56,9 +56,15 @@ async function handleSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
 
+    // Remove campos vazios ou converte para null
+    for (let [key, value] of formData.entries()) {
+        if (value === '') {
+            formData.delete(key);
+        }
+    }
     // Adicionar o ID do corretor atual
     formData.append('capturedBy', getCurrentUser().id);
-
+    formData.append('capturedByName', getCurrentUser().name);
     // Converter checkbox para booleano
     formData.set('isCondominium', form.isCondominium.checked);
     formData.set('hasBackyard', form.hasBackyard.checked);

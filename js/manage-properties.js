@@ -128,6 +128,7 @@ function createPropertyCard(property) {
             <button class="action-btn edit-btn" data-id="${property._id}">
                 <i class="fas fa-edit"></i> Editar
             </button>
+            
             <button class="action-btn delete-btn" data-id="${property._id}">
                 <i class="fas fa-trash-alt"></i> Excluir
             </button>
@@ -208,12 +209,22 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
         const modal = document.getElementById('property-details-modal');
         const modalContent = modal.querySelector('.modal-content');
+        document.getElementById('share-facebook-btn').onclick = () => {
+            const formattedProperty = {
+                ...property,
+                description: `${property.propertyType} com ${property.bedrooms} quartos, ${property.socialBathrooms} banheiros, ${property.totalArea}m². ${property.description}`,
+                images: property.images.map(img => `${window.location.origin}${img}`)
+            };
+            shareOnFacebook(formattedProperty);
+        };
 
         // Garantir que haja pelo menos 3 imagens para o carrossel
         const images = property.images && property.images.length >= 3 ? property.images :
             ['https://via.placeholder.com/800x600.png?text=Imagem+1',
                 'https://via.placeholder.com/800x600.png?text=Imagem+2',
                 'https://via.placeholder.com/800x600.png?text=Imagem+3'];
+
+
 
         modalContent.innerHTML = `
             <span class="close">&times;</span>
@@ -259,7 +270,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 </div>
                 <div class="property-details-grid">
                     ${generateDetailsSection('Informações de Captação', [
-            ['Captado por', property.capturedBy],
+            ['Captado por', property.capturedByName],
             ['Data de captação', property.captureDate ? new Date(property.captureDate).toLocaleDateString('pt-BR') : 'Não informada'],
             ['Cidade', property.captureCity],
             ['CEP', property.captureCEP]
@@ -299,15 +310,6 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 </div>
                 <div class="property-additional-info">
                     <h3>Informações Adicionais</h3>
-                    <p><strong>Captado por:</strong> ${property.capturedBy || 'Não informado'}</p>
-                    <p><strong>Data de captação:</strong> ${property.captureDate ? new Date(property.captureDate).toLocaleDateString('pt-BR') : 'Não informada'}</p>
-                    <p><strong>Área construída:</strong> ${property.builtArea || 0} m²</p>
-                    <p><strong>Vagas:</strong> ${property.garages || 0}</p>
-                    <p><strong>Suítes:</strong> ${property.suites || 0}</p>
-                    <p><strong>Banheiros sociais:</strong> ${property.socialBathrooms || 0}</p>
-                    <p><strong>Status de ocupação:</strong> ${property.occupancyStatus || 'Não informado'}</p>
-                    <p><strong>Nome do proprietário:</strong> ${property.ownerName || 'Não informado'}</p>
-                    <p><strong>Contato do proprietário:</strong> ${property.ownerContact || 'Não informado'}</p>
                     <p><strong>Diferenciais:</strong> ${property.differentials || 'Não informado'}</p>
                     <p><strong>Pontos de referência:</strong> ${property.landmarks || 'Não informado'}</p>
                     <p><strong>Observações gerais:</strong> ${property.generalObservations || 'Não informado'}</p>
@@ -315,6 +317,12 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
             </div>
             <div class="property-modal-actions">
                 <a href="edit-property.html?id=${property._id}" class="btn btn-primary">Editar Propriedade</a>
+                <button id="share-facebook-btn" class="btn btn-social btn-facebook" hidden>
+                    <i class="fab fa-facebook-f"></i> Compartilhar no Facebook
+                </button>
+                <button id="share-instagram-btn" class="btn btn-social btn-instagram">
+                    <i class="fab fa-instagram"></i> Compartilhar no Instagram
+                </button>
                 <button class="btn btn-secondary" onclick="deleteProperty('${property._id}')">Excluir Propriedade</button>
             </div>
         `;
@@ -335,6 +343,9 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
             }
         }
 
+        document.getElementById('share-facebook-btn').onclick = () => shareOnFacebook(property);
+        document.getElementById('share-instagram-btn').onclick = () => shareOnInstagram(property);
+
     } catch (error) {
         console.error('Erro ao carregar detalhes da propriedade:', error);
         showNotification('Erro ao carregar detalhes da propriedade. Por favor, tente novamente.', 'error');
@@ -343,7 +354,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
 function generateDetailsSection(title, details) {
     return `
-        <div class="details-column">
+        <div class="details-section">
             <h3>${title}</h3>
             <ul>
                 ${details.map(([key, value]) => `
@@ -486,6 +497,43 @@ function initializeModalCarousel() {
         thumbs: {
             swiper: galleryThumbs
         }
+    });
+}
+
+function shareOnFacebook(property) {
+    FB.ui({
+        method: 'share_open_graph',
+        action_type: 'og.shares',
+        action_properties: JSON.stringify({
+            object: {
+                'og:url': window.location.href,
+                'og:title': `Excelente oportunidade: ${property.title}`,
+                'og:description': `${property.description.substring(0, 200)}...`,
+                'og:image': property.images[0],
+                'og:image:width': '1200',
+                'og:image:height': '630',
+                'og:type': 'website',
+                'og:site_name': 'Parcero Imóveis',
+                'og:price:amount': property.salePrice,
+                'og:price:currency': 'BRL',
+            }
+        })
+    }, function(response) {
+        if (response && !response.error_message) {
+            alert('Compartilhado com sucesso!');
+        } else {
+            alert('Erro ao compartilhar. Por favor, tente novamente.');
+        }
+    });
+}
+
+function shareOnInstagram(property) {
+    const text = `🏠 Excelente oportunidade! 🔑\n\n${property.title}\n\n🏙️ ${property.address}, ${property.neighborhood}\n💰 R$ ${property.salePrice.toLocaleString('pt-BR')}\n\n🛏️ ${property.bedrooms} quartos\n🚿 ${property.socialBathrooms} banheiros\n📏 ${property.totalArea}m²\n\n${property.description}\n\n📞 Entre em contato para mais informações!\n\n#imoveis #venda #oportunidade`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Texto copiado para a área de transferência. Cole no Instagram para criar seu post.');
+    }).catch(err => {
+        console.error('Erro ao copiar texto: ', err);
     });
 }
 

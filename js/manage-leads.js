@@ -258,29 +258,6 @@ async function handleFormSubmit(event) {
     }
 }
 
-async function updateLeadStage(leadId, newStage) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}/stage`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ stage: newStage })
-        });
-
-        if (!response.ok) {
-            throw new Error('Falha ao atualizar estágio do lead');
-        }
-
-        // Atualização bem-sucedida, não precisamos recarregar todos os leads
-    } catch (error) {
-        console.error('Erro ao atualizar estágio do lead:', error);
-        alert('Erro ao atualizar estágio do lead. Por favor, tente novamente.');
-        loadLeads(); // Recarrega todos os leads para garantir a consistência
-    }
-}
-
 async function updateLeadStatus(leadId, newStatus) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}`, {
@@ -301,6 +278,30 @@ async function updateLeadStatus(leadId, newStatus) {
     } catch (error) {
         console.error('Erro ao atualizar status do lead:', error);
         alert('Erro ao atualizar status do lead. Por favor, tente novamente.');
+    }
+}
+
+async function updateLeadStage(leadId, newStage) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}/stage`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ stage: newStage })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Falha ao atualizar estágio do lead');
+        }
+
+        // Recarregar leads após atualização bem-sucedida
+        loadLeads();
+    } catch (error) {
+        console.error('Erro ao atualizar estágio do lead:', error);
+        alert('Erro ao atualizar estágio do lead. Por favor, tente novamente.');
     }
 }
 
@@ -355,15 +356,52 @@ function showStageActions(leadId) {
     }
 
     const stageActions = {
+        novo: [
+            {name: 'Excluir', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)}
+        ],
         contatoInicial: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
             { name: 'Fazer primeira chamada', action: () => scheduleCall(lead) },
             { name: 'Enviar e-mail de boas-vindas', action: () => sendWelcomeEmail(lead) }
         ],
         visita: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
             { name: 'Agendar visita', action: () => scheduleVisit(lead) },
             { name: 'Preparar material de apresentação', action: () => preparePresentationMaterial(lead) }
         ],
-        // Adicione ações para outros estágios conforme necessário
+        negociacao: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Enviar proposta', action: () => sendProposal(lead) }
+        ],
+        qualificacao: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Marcar como qualificado', action: () => markAsQualified(lead) }
+        ],
+        apresentacao: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Marcar como apresentado', action: () => markAsPresented(lead) }
+        ],
+        proposta: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }
+        ],
+        contrato: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Marcar como contrato assinado', action: () => markAsContractSigned(lead) }
+        ],
+        concluido: [
+            {name: 'Novo', action: () => deleteLead(leadId)},
+            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Marcar como concluído', action: () => markAsCompleted(lead) }
+        ]
     };
 
     const actions = stageActions[lead.stage] || [];

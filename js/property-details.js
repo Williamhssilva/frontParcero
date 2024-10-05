@@ -140,7 +140,7 @@ function displayPropertyDetails(property) {
     captureInfo.className = 'capture-info';
     captureInfo.innerHTML = `
         <p>Capturado em: ${new Date(property.captureDate).toLocaleDateString('pt-BR')}</p>
-        <p>Corretor responsável: ${property.capturedBy || 'Não informado'}</p>
+        <p>Corretor responsável: ${property.capturedByName || 'Não informado'}</p>
     `;
     document.getElementById('property-details').appendChild(captureInfo);
 }

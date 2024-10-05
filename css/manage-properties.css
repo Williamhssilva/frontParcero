@@ -134,12 +134,6 @@
     margin-bottom: 10px;
 }
 
-.property-price {
-    font-size: 16px;
-    color: #4CAF50;
-    margin-bottom: 5px;
-}
-
 .property-status {
     font-size: 14px;
     color: #757575;
@@ -203,7 +197,7 @@
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
-    max-width: 800px;
+    max-width: 1000px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -213,13 +207,13 @@
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #000;
     text-decoration: none;
-    cursor: pointer;
 }
 
 .property-images-carousel {
@@ -343,31 +337,10 @@
     margin-bottom: 20px;
 }
 
-.gallery-top {
-    height: 300px;
-    width: 100%;
-}
-
 .gallery-top .swiper-slide img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.gallery-thumbs {
-    height: 100px;
-    box-sizing: border-box;
-    padding: 10px 0;
-}
-
-.gallery-thumbs .swiper-slide {
-    width: 25%;
-    height: 100%;
-    opacity: 0.4;
-}
-
-.gallery-thumbs .swiper-slide-thumb-active {
-    opacity: 1;
 }
 
 .gallery-thumbs .swiper-slide img {
@@ -630,24 +603,12 @@
     text-decoration: underline;
 }
 
-.property-modal-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.property-modal-header h2 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
 
 .property-address {
     font-style: italic;
     color: #666;
 }
 
-.property-modal-gallery {
-    margin-bottom: 30px;
-}
 
 .property-main-info {
     display: flex;
@@ -656,30 +617,6 @@
     margin-bottom: 20px;
 }
 
-.property-price {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--secondary-color);
-}
-
-.property-features {
-    display: flex;
-    gap: 15px;
-}
-
-.property-features span {
-    display: flex;
-    align-items: center;
-}
-
-.property-features i {
-    margin-right: 5px;
-    color: var(--primary-color);
-}
-
-.property-description {
-    margin-bottom: 30px;
-}
 
 .property-details-grid {
     display: grid;
@@ -706,12 +643,6 @@
 
 .property-additional-info {
     margin-bottom: 30px;
-}
-
-.property-modal-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
 }
 
 @media (max-width: 768px) {
@@ -751,4 +682,157 @@
     color: white;
     cursor: pointer;
     padding: 0 5px;
+}
+
+.property-modal-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.property-modal-header h2 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.property-modal-header p {
+    color: #666;
+    font-style: italic;
+}
+
+
+.property-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.property-features {
+    display: flex;
+    gap: 15px;
+}
+
+.property-features span {
+    display: flex;
+    align-items: center;
+}
+
+.property-features i {
+    margin-right: 5px;
+    color: #3498db;
+}
+
+.property-description {
+    margin-bottom: 30px;
+}
+
+.details-section h3 {
+    color: #3498db;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.details-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.details-section li {
+    margin-bottom: 5px;
+}
+
+.property-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Ajustes para o Swiper */
+.swiper-container {
+    width: 100%;
+    height: 600px;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.gallery-thumbs .swiper-slide {
+    width: 25%;
+    height: 100%;
+    opacity: 0.4;
+}
+
+.property-modal-gallery {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.gallery-top {
+    width: 100%;
+    height: 720px; /* Aumente este valor para uma imagem maior */
+}
+
+.gallery-top .swiper-slide {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.gallery-top img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.gallery-thumbs {
+    height: 150px;
+    box-sizing: border-box;
+    padding: 10px 0;
+}
+
+.gallery-thumbs .swiper-slide-thumb-active {
+    opacity: 1;
+}
+
+.gallery-thumbs img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 4px;
+    color: #fff;
+    transition: background-color 0.3s ease;
+    margin-right: 10px;
+}
+
+.btn-social i {
+    margin-right: 8px;
+}
+
+.btn-facebook {
+    background-color: #3b5998;
+}
+
+.btn-facebook:hover {
+    background-color: #2d4373;
+}
+
+.btn-instagram {
+    background-color: #e4405f;
+}
+
+.btn-instagram:hover {
+    background-color: #d53a55;
 }

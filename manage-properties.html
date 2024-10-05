@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <link rel="stylesheet" href="./css/manage-properties.css">
+
 </head>
+
 <body>
     <header>
         <div class="container">
@@ -27,7 +30,8 @@
         </div>
         <div class="manage-actions">
             <!-- botões de ação -->
-            <a href="add-property.html" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Nova Propriedade</a>
+            <a href="add-property.html" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Nova
+                Propriedade</a>
         </div>
         <div id="properties-list" class="properties-grid"></div>
         <div id="pagination" class="pagination"></div>
@@ -40,102 +44,78 @@
     <div id="property-details-modal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <div id="property-view-mode">
-                <div class="property-header">
-                    <h2 id="modal-property-title"></h2>
-                    <p id="modal-property-price" class="property-price"></p>
-                </div>
-                <div class="property-gallery">
-                    <div class="swiper-container gallery-top">
-                        <div class="swiper-wrapper" id="modal-property-images">
-                            <!-- Imagens serão inseridas aqui dinamicamente -->
-                        </div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
-                    </div>
-                    <div class="swiper-container gallery-thumbs">
-                        <div class="swiper-wrapper" id="modal-property-thumbs">
-                            <!-- Miniaturas serão inseridas aqui dinamicamente -->
-                        </div>
-                    </div>
-                </div>
-                <div class="property-info">
-                    <div class="property-details">
-                        <h3>Detalhes da Propriedade</h3>
-                        <p id="modal-property-address"></p>
-                        <p id="modal-property-details"></p>
-                        <p id="modal-property-additional-info"></p>
-                    </div>
-                    <div class="property-description">
-                        <h3>Descrição</h3>
-                        <p id="modal-property-description"></p>
-                    </div>
-                </div>
-                <button id="edit-property-btn" class="btn btn-primary">Editar Propriedade</button>
+            <div class="property-modal-header">
+                <h2 id="modal-property-title"></h2>
+                <p id="modal-property-address"></p>
             </div>
-            <div id="property-edit-mode" style="display: none;">
-                <h2>Editar Propriedade</h2>
-                <form id="edit-property-form">
-                    <div class="form-group">
-                        <label for="edit-title">Título</label>
-                        <input type="text" id="edit-title" name="title" required>
+            <div class="property-modal-gallery">
+                <div class="swiper-container gallery-top">
+                    <div class="swiper-wrapper" id="modal-property-images"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                <div class="swiper-container gallery-thumbs">
+                    <div class="swiper-wrapper" id="modal-property-thumbs"></div>
+                </div>
+            </div>
+            <div class="property-modal-details">
+                <div class="property-main-info">
+                    <div class="property-price">R$ <span id="modal-property-price"></span></div>
+                    <div class="property-features">
+                        <span><i class="fas fa-home"></i> <span id="modal-property-type"></span></span>
+                        <span><i class="fas fa-bed"></i> <span id="modal-property-bedrooms"></span></span>
+                        <span><i class="fas fa-bath"></i> <span id="modal-property-bathrooms"></span></span>
+                        <span><i class="fas fa-ruler-combined"></i> <span id="modal-property-area"></span> m²</span>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-price">Preço de Venda</label>
-                        <input type="number" id="edit-price" name="salePrice" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-address">Endereço</label>
-                        <input type="text" id="edit-address" name="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-neighborhood">Bairro</label>
-                        <input type="text" id="edit-neighborhood" name="neighborhood" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-property-type">Tipo de Imóvel</label>
-                        <select id="edit-property-type" name="propertyType" required>
-                            <option value="Casa">Casa</option>
-                            <option value="Apartamento">Apartamento</option>
-                            <option value="Lote">Lote</option>
-                            <option value="Comercial">Comercial</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-total-area">Área Total (m²)</label>
-                        <input type="number" id="edit-total-area" name="totalArea" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-built-area">Área Construída (m²)</label>
-                        <input type="number" id="edit-built-area" name="builtArea" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-garages">Vagas</label>
-                        <input type="number" id="edit-garages" name="garages" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-bedrooms">Quartos</label>
-                        <input type="number" id="edit-bedrooms" name="bedrooms" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-bathrooms">Banheiros</label>
-                        <input type="number" id="edit-bathrooms" name="bathrooms" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-description">Descrição</label>
-                        <textarea id="edit-description" name="description" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    <button type="button" id="cancel-edit" class="btn btn-secondary">Cancelar</button>
-                </form>
+                </div>
+                <div class="property-description">
+                    <h3>Descrição</h3>
+                    <p id="modal-property-description"></p>
+                </div>
+                <div class="property-details-grid" id="property-details-grid"></div>
+            </div>
+            <div class="property-modal-actions">
+                <button id="edit-property-btn" class="btn btn-primary"><i class="fas fa-edit"></i> Editar</button>
+                <button id="share-facebook-btn" class="btn btn-social btn-facebook" hidden>
+                    <i class="fab fa-facebook-f"></i> Compartilhar no Facebook
+                </button>
+                <button id="share-instagram-btn" class="btn btn-social btn-instagram">
+                    <i class="fab fa-instagram"></i> Compartilhar no Instagram
+                </button>
+                <button id="delete-property-btn" class="btn btn-danger"><i class="fas fa-trash-alt"></i>
+                    Excluir</button>
             </div>
         </div>
     </div>
+    <script>
+        function generateNonce(length = 16) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let nonce = '';
+            for (let i = 0; i < length; i++) {
+                nonce += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return nonce;
+        }
 
+        const nonce = generateNonce();
+        
+        // Criar o script do Facebook SDK dinamicamente
+        const fbScript = document.createElement('script');
+        fbScript.src = `https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v12.0&appId=2846032102230931`;
+        fbScript.nonce = nonce;
+        fbScript.async = true;
+        fbScript.defer = true;
+        fbScript.crossOrigin = 'anonymous';
+        
+        // Adicionar o script ao final do body
+        document.body.appendChild(fbScript);
+    </script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/menu.js"></script>
     <script type="module" src="js/config.js"></script>
     <script type="module" src="js/auth.js"></script>
     <script type="module" src="js/manage-properties.js"></script>
+    <div id="fb-root"></div>
 </body>
+
 </html>

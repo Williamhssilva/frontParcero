@@ -1,58 +1,211 @@
 .manage-leads {
     padding: 20px 0;
-    padding-bottom: 80px; /* Adiciona espaço para o menu fixo */
+    padding-bottom: 80px;
 }
 
-.leads-filters {
-    display: flex;
-    gap: 10px;
+.page-title {
+    font-size: 28px;
+    color: #333;
     margin-bottom: 20px;
 }
 
-#leads-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-#leads-table th,
-#leads-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-#leads-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-}
-
-.btn {
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
+.actions-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .btn-primary {
     background-color: #4CAF50;
     color: white;
     border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.btn-edit {
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.leads-filters {
+    display: flex;
+    gap: 10px;
+}
+
+.leads-filters input,
+.leads-filters select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.sales-funnel-container {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.sales-funnel {
+    display: flex;
+    gap: 20px;
+    min-width: max-content;
+}
+
+.stage {
+    flex: 0 0 250px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stage h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50;
+}
+
+.stage-leads {
+    height: 100%;
+}
+
+/* Estilos para o Sortable */
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.sortable-chosen {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.sortable-drag {
+    opacity: 0.8;
+    transform: rotate(2deg);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .actions-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .leads-filters {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+
+    .sales-funnel-container {
+        padding: 10px;
+    }
+
+    .stage {
+        flex: 0 0 200px;
+    }
+}
+
+.lead-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.lead-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.lead-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.lead-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.lead-stage {
+    font-size: 12px;
+    background-color: #e0e0e0;
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: #555;
+}
+
+.lead-card-body {
+    margin-bottom: 15px;
+}
+
+.lead-phone, .lead-email, .lead-interest {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.lead-phone {
+    color: #4CAF50;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.lead-phone:hover {
+    color: #45a049;
+}
+
+.lead-card-body i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+
+.lead-card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-actions {
     background-color: #2196F3;
     color: white;
     border: none;
-}
-
-.btn-delete {
-    background-color: #f44336;
-    color: white;
-    border: none;
-}
-
-.status-select {
-    padding: 5px;
+    padding: 5px 10px;
     border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-actions:hover {
+    background-color: #1976D2;
+}
+
+/* Ajuste para o container dos estágios */
+.stage {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+}
+
+/* Ajuste para o scroll horizontal */
+.sales-funnel-container {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
 }
 
 .modal {
@@ -69,13 +222,12 @@
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .close {
@@ -88,195 +240,34 @@
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #000;
     text-decoration: none;
     cursor: pointer;
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-
-.form-group input,
-.form-group select {
+#lead-form input,
+#lead-form select,
+#edit-lead-form input,
+#edit-lead-form select {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
+    margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
 }
 
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.btn {
-    padding: 8px 15px;
+#lead-form button,
+#edit-lead-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
 }
 
-.btn-primary {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.btn-primary:hover {
+#lead-form button:hover,
+#edit-lead-form button:hover {
     background-color: #45a049;
-}
-
-.btn-secondary {
-    background-color: #f4f4f4;
-    color: #333;
-}
-
-.btn-secondary:hover {
-    background-color: #e7e7e7;
-}
-
-@media (max-width: 768px) {
-    .manage-leads {
-        padding-bottom: 100px; /* Aumenta o espaço em telas menores */
-    }
-
-    #leads-table, #leads-table thead, #leads-table tbody, #leads-table th, #leads-table td, #leads-table tr {
-        display: block;
-    }
-
-    #leads-table thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    #leads-table tr {
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-    }
-
-    #leads-table td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-    }
-
-    #leads-table td:before {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        content: attr(data-label);
-        font-weight: bold;
-    }
-
-    #leads-table td:last-child {
-        border-bottom: 0;
-    }
-}
-
-.sales-funnel {
-    display: flex;
-    justify-content: flex-start; /* Alterado de space-between para flex-start */
-    overflow-x: auto;
-    padding-bottom: 20px;
-    height: 80vh;
-    cursor: grab; /* Indica que o elemento é arrastável */
-    user-select: none; /* Previne seleção de texto durante o arrasto */
-}
-
-.sales-funnel:active {
-    cursor: grabbing; /* Muda o cursor quando está arrastando */
-}
-
-.stage {
-    flex: 0 0 200px;
-    margin: 0 10px;
-    background-color: #f4f4f4;
-    border-radius: 5px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Faz o .stage ocupar toda a altura do .sales-funnel */
-}
-
-.stage h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.stage-leads {
-    flex-grow: 1; /* Faz o .stage-leads crescer e preencher o espaço restante */
-    overflow-y: auto; /* Adiciona rolagem vertical se necessário */
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-}
-
-.lead-card {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.lead-card:hover {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.lead-card:active {
-    cursor: grabbing;
-}
-
-/* ... (resto do CSS permanece o mesmo) ... */
-
-.btn-actions {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-top: 5px;
-}
-
-/* Estilos para o Sortable */
-.sortable-ghost {
-    opacity: 0.6;
-    background-color: #f0f0f0;
-}
-
-.sortable-chosen {
-    background-color: #ffffff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-.sortable-drag {
-    opacity: 1;
-    background-color: #ffffff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    transform: rotate(2deg);
-}
-
-.lead-card:hover {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.stage-placeholder {
-    min-height: 50px;
 }

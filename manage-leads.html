@@ -18,125 +18,81 @@
     </header>
 
     <main class="manage-leads container">
-        <h1>Gerenciar Leads</h1>
-        <!-- Alteração aqui: Mudamos o ID para 'add-lead-button' -->
-        <button id="add-lead-button" class="btn btn-primary">Adicionar Novo Lead</button>
-        <div class="leads-filters">
-            <input type="text" id="search-leads" placeholder="Pesquisar leads...">
-            <select id="stage-filter">
-                <option value="">Todos os estágios</option>
-                <option value="novo">Novo</option>
-                <option value="contatoInicial">Contato Inicial</option>
-                <option value="qualificacao">Qualificação</option>
-                <option value="apresentacao">Apresentação</option>
-                <option value="visita">Visita</option>
-                <option value="negociacao">Negociação</option>
-                <option value="proposta">Proposta</option>
-                <option value="contrato">Contrato</option>
-                <option value="concluido">Concluído</option>
-            </select>
-            <select id="status-filter">
-                <option value="">Todos os status</option>
-                <option value="novo">Novo</option>
-                <option value="em_andamento">Em andamento</option>
-                <option value="qualificado">Qualificado</option>
-                <option value="perdido">Perdido</option>
-                <option value="convertido">Convertido</option>
-            </select>
-            <select id="interest-filter">
-                <option value="">Todos os interesses</option>
-                <option value="compra">Compra</option>
-                <option value="venda">Venda</option>
-                <option value="aluguel">Aluguel</option>
-                <option value="investimento">Investimento</option>
-            </select>
-        </div>
-        
-
-        <!-- Adicione este formulário após a tabela de leads -->
-        <div id="lead-form-container" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h2 id="lead-form-title">Adicionar Novo Lead</h2>
-                <form id="lead-form">
-                    <div class="form-group">
-                        <label for="name">Nome</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Telefone</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="interest">Interesse</label>
-                        <select id="interest" name="interest" required>
-                            <option value="">Selecione o interesse</option>
-                            <option value="compra">Compra</option>
-                            <option value="venda">Venda</option>
-                            <option value="aluguel">Aluguel</option>
-                            <option value="investimento">Investimento</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select id="status" name="status" required>
-                            <option value="">Selecione o status</option>
-                            <option value="novo">Novo</option>
-                            <option value="em_andamento">Em andamento</option>
-                            <option value="qualificado">Qualificado</option>
-                            <option value="perdido">Perdido</option>
-                            <option value="convertido">Convertido</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeForm()">Cancelar</button>
-                    </div>
-                </form>
+        <h1 class="page-title">Gerenciar Leads</h1>
+        <div class="actions-bar">
+            <button id="add-lead-button" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Novo Lead</button>
+            <div class="leads-filters">
+                <input type="text" id="search-leads" placeholder="Pesquisar leads...">
+                <select id="stage-filter">
+                    <option value="">Todos os estágios</option>
+                    <option value="novo">Novo</option>
+                    <option value="contatoInicial">Contato Inicial</option>
+                    <option value="qualificacao">Qualificação</option>
+                    <option value="apresentacao">Apresentação</option>
+                    <option value="visita">Visita</option>
+                    <option value="negociacao">Negociação</option>
+                    <option value="proposta">Proposta</option>
+                    <option value="contrato">Contrato</option>
+                    <option value="concluido">Concluído</option>
+                </select>
+                <select id="status-filter">
+                    <option value="">Todos os status</option>
+                    <option value="novo">Novo</option>
+                    <option value="em_andamento">Em andamento</option>
+                    <option value="qualificado">Qualificado</option>
+                    <option value="perdido">Perdido</option>
+                    <option value="convertido">Convertido</option>
+                </select>
+                <select id="interest-filter">
+                    <option value="">Todos os interesses</option>
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                    <option value="aluguel">Aluguel</option>
+                    <option value="investimento">Investimento</option>
+                </select>
             </div>
         </div>
 
-        <div class="sales-funnel">
-            <div class="stage" id="novo">
-                <h3>Novo</h3>
-                <div class="stage-leads" data-stage="novo">
-                    <!-- Os cards de lead serão inseridos aqui dinamicamente -->
+        <div class="sales-funnel-container">
+            <div class="sales-funnel">
+                <div class="stage" id="novo">
+                    <h3>Novo</h3>
+                    <div class="stage-leads" data-stage="novo">
+                        <!-- Os cards de lead serão inseridos aqui dinamicamente -->
+                    </div>
                 </div>
-            </div>
-            <div class="stage" id="contatoInicial">
-                <h3>Contato Inicial</h3>
-                <div class="stage-leads" data-stage="contatoInicial"></div>
-            </div>
-            <div class="stage" id="qualificacao">
-                <h3>Qualificação</h3>
-                <div class="stage-leads" data-stage="qualificacao"></div>
-            </div>
-            <div class="stage" id="apresentacao">
-                <h3>Apresentação</h3>
-                <div class="stage-leads" data-stage="apresentacao"></div>
-            </div>
-            <div class="stage" id="visita">
-                <h3>Visita</h3>
-                <div class="stage-leads" data-stage="visita"></div>
-            </div>
-            <div class="stage" id="negociacao">
-                <h3>Negociação</h3>
-                <div class="stage-leads" data-stage="negociacao"></div>
-            </div>
-            <div class="stage" id="proposta">
-                <h3>Proposta</h3>
-                <div class="stage-leads" data-stage="proposta"></div>
-            </div>
-            <div class="stage" id="contrato">
-                <h3>Contrato</h3>
-                <div class="stage-leads" data-stage="contrato"></div>
-            </div>
-            <div class="stage" id="concluido">
-                <h3>Concluído</h3>
-                <div class="stage-leads" data-stage="concluido"></div>
+                <div class="stage" id="contatoInicial">
+                    <h3>Contato Inicial</h3>
+                    <div class="stage-leads" data-stage="contatoInicial"></div>
+                </div>
+                <div class="stage" id="qualificacao">
+                    <h3>Qualificação</h3>
+                    <div class="stage-leads" data-stage="qualificacao"></div>
+                </div>
+                <div class="stage" id="apresentacao">
+                    <h3>Apresentação</h3>
+                    <div class="stage-leads" data-stage="apresentacao"></div>
+                </div>
+                <div class="stage" id="visita">
+                    <h3>Visita</h3>
+                    <div class="stage-leads" data-stage="visita"></div>
+                </div>
+                <div class="stage" id="negociacao">
+                    <h3>Negociação</h3>
+                    <div class="stage-leads" data-stage="negociacao"></div>
+                </div>
+                <div class="stage" id="proposta">
+                    <h3>Proposta</h3>
+                    <div class="stage-leads" data-stage="proposta"></div>
+                </div>
+                <div class="stage" id="contrato">
+                    <h3>Contrato</h3>
+                    <div class="stage-leads" data-stage="contrato"></div>
+                </div>
+                <div class="stage" id="concluido">
+                    <h3>Concluído</h3>
+                    <div class="stage-leads" data-stage="concluido"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -144,11 +100,55 @@
     <nav class="bottom-menu">
         <!-- O menu será preenchido dinamicamente pelo JavaScript -->
     </nav>
+    
+    <div id="lead-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Adicionar Novo Lead</h2>
+            <form id="lead-form">
+                <input type="text" name="name" placeholder="Nome" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Telefone" required>
+                <select name="interest" required>
+                    <option value="">Selecione o interesse</option>
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                    <option value="aluguel">Aluguel</option>
+                    <option value="investimento">Investimento</option>
+                </select>
+                <button type="submit">Salvar Lead</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- Remova ou comente esta linha -->
-    <!-- <script src="./js/config.js"></script> -->
+    <div id="edit-lead-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Lead</h2>
+            <form id="edit-lead-form">
+                <input type="text" name="name" placeholder="Nome" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Telefone" required>
+                <select name="interest" required>
+                    <option value="">Selecione o interesse</option>
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                    <option value="aluguel">Aluguel</option>
+                    <option value="investimento">Investimento</option>
+                </select>
+                <select name="status" required>
+                    <option value="">Selecione o status</option>
+                    <option value="novo">Novo</option>
+                    <option value="em_andamento">Em andamento</option>
+                    <option value="qualificado">Qualificado</option>
+                    <option value="perdido">Perdido</option>
+                    <option value="convertido">Convertido</option>
+                </select>
+                <button type="submit">Atualizar Lead</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- Certifique-se de que este script está como type="module" -->
     <script type="module" src="./js/manage-leads.js"></script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/menu.js"></script>

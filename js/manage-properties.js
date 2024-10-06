@@ -380,7 +380,7 @@ function updatePagination(currentPage, totalPages) {
         }
 
         for (let i = 1; i <= totalPages; i++) {
-            const pageButton = createPaginationButton(i, () => changePage(i), i === currentPage);
+            const pageButton = createPaginationButton(i.toString(), () => changePage(i), i === currentPage);
             paginationContainer.appendChild(pageButton);
         }
 
@@ -394,10 +394,11 @@ function updatePagination(currentPage, totalPages) {
 function createPaginationButton(text, onClick, isActive = false) {
     const button = document.createElement('button');
     button.textContent = text;
-    button.addEventListener('click', onClick);
+    button.classList.add('pagination-button');
     if (isActive) {
         button.classList.add('active');
     }
+    button.addEventListener('click', onClick);
     return button;
 }
 
@@ -405,6 +406,7 @@ function changePage(page) {
     currentPage = page;
     displayProperties(currentPage);
     updatePagination(currentPage, Math.ceil(filteredProperties.length / limit));
+    window.scrollTo(0, 0);
 }
 
 function setupModal() {

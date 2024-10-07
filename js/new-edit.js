@@ -292,41 +292,30 @@ function setupImagePreview(property) {
     console.log('setupImagePreview concluído');
 }
 
-async function removeImage(index, imgContainer) {
-    console.log(`Iniciando remoção da imagem ${index}`);
-    try {
-        const url = `${API_BASE_URL}/api/properties/${currentProperty._id}/images/${index}`;
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+function removeImage(index, imgContainer) {
+    console.log(`Marcando imagem ${index} para remoção`);
+    imgContainer.classList.add('marked-for-removal');
+    imgContainer.style.opacity = '0.5';
+    const removeButton = imgContainer.querySelector('.remove-image');
+    removeButton.textContent = 'Desfazer';
+    removeButton.onclick = () => undoRemoveImage(index, imgContainer);
+    showNotification('Imagem marcada para remoção. Clique em Salvar Alterações para confirmar.', 'info');
+}
 
-        if (!response.ok) {
-            throw new Error('Falha ao remover a imagem');
-        }
-
-        const data = await response.json();
-        console.log('Dados da resposta de remoção:', data);
-
-        // Remova o elemento da UI
-        imgContainer.remove();
-
-        // Atualize o array de imagens da propriedade atual
-        currentProperty.images = data.data.property.images;
-        console.log('Array de imagens atualizado:', currentProperty.images);
-
-        showNotification('Imagem removida com sucesso', 'success');
-    } catch (error) {
-        console.error('Erro ao remover imagem:', error);
-        showNotification(`Erro ao remover imagem: ${error.message}`, 'error');
-    }
+function undoRemoveImage(index, imgContainer) {
+    console.log(`Desmarcando imagem ${index} para remoção`);
+    imgContainer.classList.remove('marked-for-removal');
+    imgContainer.style.opacity = '1';
+    const removeButton = imgContainer.querySelector('.remove-image');
+    removeButton.textContent = 'X';
+    removeButton.onclick = () => removeImage(index, imgContainer);
+    showNotification('Remoção da imagem desfeita.', 'info');
 }
 
 async function handleSubmit(event) {
     event.preventDefault();
     console.log('Iniciando submissão do formulário');
+
     const form = event.target;
     const formData = new FormData(form);
     
@@ -339,12 +328,21 @@ async function handleSubmit(event) {
     // Lidar com o campo hasPromotion separadamente
     formData.set('exclusivityContract.hasPromotion', form.querySelector('#hasPromotion')?.checked.toString() || 'false');
 
-    // Adicionar imagens existentes que não foram removidas
-    const existingImages = currentProperty.images.filter((_, index) =>
-        !document.querySelector(`.remove-image[data-index="${index}"]`)?.closest('.image-preview')?.classList.contains('removed')
-    );
-    formData.append('existingImages', JSON.stringify(existingImages));
-    console.log('Imagens existentes após filtragem:', existingImages);
+    // Lidar com as imagens
+    const imagesToKeep = [];
+    const imagesToRemove = [];
+    currentProperty.images.forEach((image, index) => {
+        const imgContainer = document.querySelector(`.image-preview:nth-child(${index + 1})`);
+        if (imgContainer && !imgContainer.classList.contains('marked-for-removal')) {
+            imagesToKeep.push(image);
+        } else {
+            imagesToRemove.push(index);
+        }
+    });
+
+    formData.set('existingImages', JSON.stringify(imagesToKeep));
+    formData.set('imagesToRemove', JSON.stringify(imagesToRemove));
+
     // Adicionar novas imagens
     const newImagesInput = form.querySelector('#new-images');
     if (newImagesInput && newImagesInput.files.length > 0) {
@@ -392,34 +390,5 @@ function showNotification(message, type = 'info') {
     // Implementação da notificação
 }
 
-function waitForElement(selector) {
-    console.log(`Esperando pelo elemento: ${selector}`);
-    return new Promise(resolve => {
-        if (document.getElementById(selector)) {
-            console.log(`Elemento encontrado: ${selector}`);
-            return resolve(document.getElementById(selector));
-        }
-
-        const observer = new MutationObserver(mutations => {
-            if (document.getElementById(selector)) {
-                console.log(`Elemento encontrado: ${selector}`);
-                resolve(document.getElementById(selector));
-                observer.disconnect();
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        // Adicione um timeout para evitar que a promessa fique pendente indefinidamente
-        setTimeout(() => {
-            console.log(`Timeout ao esperar pelo elemento: ${selector}`);
-            observer.disconnect();
-            resolve(null);
-        }, 5000); // 5 segundos de timeout
-    });
-}
 
 // Adicione aqui outras funções auxiliares conforme necessário

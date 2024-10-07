@@ -6,10 +6,15 @@ let currentProperty = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     checkPermission(['corretor', 'administrador']);
-    renderMenu();
+    setupForm();
     loadPropertyData();
-    setupImageUpload();
+    renderMenu();
 });
+
+function setupForm() {
+    const form = document.getElementById('edit-property-form');
+    form.addEventListener('submit', handleSubmit);
+}
 
 async function loadPropertyData() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -21,6 +26,7 @@ async function loadPropertyData() {
     }
 
     try {
+     
         const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -44,6 +50,9 @@ async function loadPropertyData() {
         console.log('Propriedade atual:', currentProperty);
 
         populateForm(currentProperty);
+
+        setupImagePreview(currentProperty);
+
     } catch (error) {
         console.error('Erro ao carregar dados da propriedade:', error);
         showNotification(`Erro ao carregar dados da propriedade: ${error.message}`, 'error');
@@ -51,15 +60,18 @@ async function loadPropertyData() {
 }
 
 function populateForm(property) {
-    if (!property) {
-        console.error('Dados da propriedade não disponíveis');
-        showNotification('Erro ao carregar dados da propriedade', 'error');
-        return;
-    }
-
     const form = document.getElementById('edit-property-form');
-
     form.innerHTML = `
+        
+        <div class="form-group">
+            <label for="title">Título da Propriedade</label>
+            <input type="text" id="title" name="title" value="${property.title || ''}" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Descrição da Propriedade</label>
+            <textarea id="description" name="description" required>${property.description || ''}</textarea>
+        </div>
+
         <h2>Informações de Captação</h2>
         <div class="form-group">
             <label for="captureCity">Cidade de Captação</label>
@@ -200,8 +212,8 @@ function populateForm(property) {
             <input type="date" id="exclusivityEndDate" name="exclusivityEndDate" value="${property.exclusivityContract?.endDate?.split('T')[0] || ''}">
         </div>
         <div class="form-group">
-            <label for="hasPromotion">Possui Promoção?</label>
-            <input type="checkbox" id="hasPromotion" name="hasPromotion" ${property.exclusivityContract?.hasPromotion ? 'checked' : ''}>
+            <label for="hasPromotion">Tem Promoção</label>
+            <input type="checkbox" id="hasPromotion" name="exclusivityContract.hasPromotion" ${property.exclusivityContract?.hasPromotion ? 'checked' : ''}>
         </div>
 
         <h2>Detalhes Adicionais</h2>
@@ -216,122 +228,133 @@ function populateForm(property) {
         <div class="form-group">
             <label for="generalObservations">Observações Gerais</label>
             <textarea id="generalObservations" name="generalObservations">${property.generalObservations || ''}</textarea>
-        </div>
-
-        <h2>Imagens da Propriedade</h2>
-        <div id="existing-images" class="image-preview-container"></div>
-
+        </div>    
+        
         <div class="form-group">
-            <label for="new-images">Adicionar novas imagens</label>
-            <input type="file" id="new-images" name="images" multiple accept="image/*">
+            <h1>Adicionar Novas Imagens</h1>
+            <input type="file" id="images" name="images" multiple accept="image/*">
         </div>
-
-        <div class="form-group">
-            <label for="title">Título da Propriedade</label>
-            <input type="text" id="title" name="title" value="${property.title || ''}" required>
-        </div>
-        <div class="form-group">
-            <label for="description">Descrição da Propriedade</label>
-            <textarea id="description" name="description" required>${property.description || ''}</textarea>
-        </div>
+        <h2>Imagens</h2>
+        
 
         <button type="submit" class="submit-btn">Salvar Alterações</button>
     `;
 
-    form.addEventListener('submit', handleEditSubmit);
+    // Crie o elemento image-preview se ele não existir
+    let imagePreviewElement = document.getElementById('image-preview');
+    if (!imagePreviewElement) {
+        imagePreviewElement = document.createElement('div');
+        imagePreviewElement.id = 'image-preview';
+        form.appendChild(imagePreviewElement);
+    }
 
-    // Chame a função para exibir as imagens existentes aqui
-    displayExistingImages(property.images || []);
+    // Adicione event listeners para os botões de remover imagem
+    const removeButtons = form.querySelectorAll('.remove-image');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const index = this.dataset.index;
+            this.closest('.image-preview').remove();
+        });
+    });
+
+    // Adicione event listener para o formulário
+    form.addEventListener('submit', handleSubmit);
 }
 
-function displayExistingImages(images) {
-    const imageContainer = document.getElementById('existing-images');
-    if (!imageContainer) {
-        console.error('Elemento "existing-images" não encontrado');
+function setupImagePreview(property) {
+    console.log('Iniciando setupImagePreview com propriedade:', property);
+    const existingImagesContainer = document.getElementById('image-preview');
+    console.log('Elemento image-preview:', existingImagesContainer);
+    
+    if (!existingImagesContainer) {
+        console.error('Elemento image-preview não encontrado');
         return;
     }
 
-    imageContainer.innerHTML = '';
-
-    if (images && images.length > 0) {
-        images.forEach((image, index) => {
-            const imgElement = document.createElement('div');
-            imgElement.className = 'image-preview';
-            imgElement.innerHTML = `
-                <img src="${API_BASE_URL}${image}" alt="Imagem ${index + 1}">
-                <button type="button" class="remove-image" data-index="${index}">Remover</button>
-            `;
-            imageContainer.appendChild(imgElement);
-        });
-    } else {
-        imageContainer.innerHTML = '<p>Nenhuma imagem disponível</p>';
-    }
-
-    imageContainer.addEventListener('click', handleImageRemove);
-}
-
-function handleImageRemove(event) {
-    if (event.target.classList.contains('remove-image')) {
-        const index = event.target.dataset.index;
-        currentProperty.images.splice(index, 1);
-        displayExistingImages(currentProperty.images);
-    }
-}
-
-function setupImageUpload() {
-    const imageInput = document.getElementById('new-images');
-    const previewContainer = document.getElementById('new-images-preview');
-
-    imageInput.addEventListener('change', () => {
-        previewContainer.innerHTML = '';
-        Array.from(imageInput.files).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const preview = document.createElement('div');
-                preview.className = 'image-preview';
-                preview.innerHTML = `
-                    <img src="${e.target.result}" alt="Nova imagem ${index + 1}">
-                    <button type="button" class="remove-new-image" data-index="${index}">Remover</button>
-                `;
-                previewContainer.appendChild(preview);
-            };
-            reader.readAsDataURL(file);
-        });
-    });
-
-    previewContainer.addEventListener('click', (event) => {
-        if (event.target.classList.contains('remove-new-image')) {
-            const index = parseInt(event.target.dataset.index);
-            const newFileList = Array.from(imageInput.files).filter((_, i) => i !== index);
-            imageInput.files = createFileList(newFileList);
-            event.target.closest('.image-preview').remove();
+    existingImagesContainer.innerHTML = property.images.map((image, index) => `
+        <div class="image-preview">
+            <img src="${API_BASE_URL}${image}" alt="Imagem ${index + 1}">
+            <button type="button" class="remove-image" data-index="${index}">X</button>
+        </div>
+    `).join('');
+    
+    existingImagesContainer.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-image')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const index = e.target.dataset.index;
+            const imgContainer = e.target.closest('.image-preview');
+            console.log(`Botão de remoção clicado para a imagem ${index}`);
+            removeImage(index, imgContainer);
         }
     });
+
+    console.log('setupImagePreview concluído');
 }
 
-function createFileList(files) {
-    const dt = new DataTransfer();
-    files.forEach(file => dt.items.add(file));
-    return dt.files;
+async function removeImage(index, imgContainer) {
+    console.log(`Iniciando remoção da imagem ${index}`);
+    try {
+        const url = `${API_BASE_URL}/api/properties/${currentProperty._id}/images/${index}`;
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao remover a imagem');
+        }
+
+        const data = await response.json();
+        console.log('Dados da resposta de remoção:', data);
+
+        // Remova o elemento da UI
+        imgContainer.remove();
+
+        // Atualize o array de imagens da propriedade atual
+        currentProperty.images = data.data.property.images;
+        console.log('Array de imagens atualizado:', currentProperty.images);
+
+        showNotification('Imagem removida com sucesso', 'success');
+    } catch (error) {
+        console.error('Erro ao remover imagem:', error);
+        showNotification(`Erro ao remover imagem: ${error.message}`, 'error');
+    }
 }
 
-async function handleEditSubmit(event) {
+async function handleSubmit(event) {
     event.preventDefault();
+    console.log('Iniciando submissão do formulário');
     const form = event.target;
     const formData = new FormData(form);
-
-    // Adicione as imagens existentes que não foram removidas
-    currentProperty.images.forEach((image, index) => {
-        formData.append(`existingImages[${index}]`, image);
+    
+    // Adicionar campos booleanos explicitamente
+    const booleanFields = ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator'];
+    booleanFields.forEach(field => {
+        formData.set(field, form.querySelector(`#${field}`)?.checked.toString() || 'false');
     });
 
-    // Adicione as novas imagens
-    const newImages = form.querySelector('#new-images').files;
-    Array.from(newImages).forEach((file, index) => {
-        formData.append(`images`, file);
-    });
+    // Lidar com o campo hasPromotion separadamente
+    formData.set('exclusivityContract.hasPromotion', form.querySelector('#hasPromotion')?.checked.toString() || 'false');
+
+    // Adicionar imagens existentes que não foram removidas
+    const existingImages = currentProperty.images.filter((_, index) =>
+        !document.querySelector(`.remove-image[data-index="${index}"]`)?.closest('.image-preview')?.classList.contains('removed')
+    );
+    formData.append('existingImages', JSON.stringify(existingImages));
+    console.log('Imagens existentes após filtragem:', existingImages);
+    // Adicionar novas imagens
+    const newImagesInput = form.querySelector('#new-images');
+    if (newImagesInput && newImagesInput.files.length > 0) {
+        Array.from(newImagesInput.files).forEach(file => {
+            formData.append('images', file);
+        });
+    }
 
     try {
+        showLoading();
         const response = await fetch(`${API_BASE_URL}/api/properties/${currentProperty._id}`, {
             method: 'PATCH',
             headers: {
@@ -342,24 +365,61 @@ async function handleEditSubmit(event) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Falha ao atualizar a propriedade');
+            throw new Error(errorData.message || 'Falha ao atualizar propriedade');
         }
+
+        const data = await response.json();
 
         showNotification('Propriedade atualizada com sucesso!', 'success');
         setTimeout(() => window.location.href = 'manage-properties.html', 2000);
     } catch (error) {
-        console.error('Erro ao atualizar a propriedade:', error);
-        showNotification(`Erro ao atualizar a propriedade: ${error.message}`, 'error');
+        console.error('Erro ao atualizar propriedade:', error);
+        showNotification(`Erro ao atualizar propriedade: ${error.message}`, 'error');
+    } finally {
+        hideLoading();
     }
 }
 
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+function showLoading() {
+    // Implementação do indicador de carregamento
 }
+
+function hideLoading() {
+    // Implementação para esconder o indicador de carregamento
+}
+
+function showNotification(message, type = 'info') {
+    // Implementação da notificação
+}
+
+function waitForElement(selector) {
+    console.log(`Esperando pelo elemento: ${selector}`);
+    return new Promise(resolve => {
+        if (document.getElementById(selector)) {
+            console.log(`Elemento encontrado: ${selector}`);
+            return resolve(document.getElementById(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+            if (document.getElementById(selector)) {
+                console.log(`Elemento encontrado: ${selector}`);
+                resolve(document.getElementById(selector));
+                observer.disconnect();
+            }
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        // Adicione um timeout para evitar que a promessa fique pendente indefinidamente
+        setTimeout(() => {
+            console.log(`Timeout ao esperar pelo elemento: ${selector}`);
+            observer.disconnect();
+            resolve(null);
+        }, 5000); // 5 segundos de timeout
+    });
+}
+
+// Adicione aqui outras funções auxiliares conforme necessário

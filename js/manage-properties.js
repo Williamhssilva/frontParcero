@@ -176,7 +176,7 @@ function setupEventListeners() {
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
             const propertyId = button.getAttribute('data-id');
-            window.location.href = `edit-property.html?id=${propertyId}`;
+            window.location.href = `new-edit.html?id=${propertyId}`;
         });
     });
 
@@ -316,7 +316,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 </div>
             </div>
             <div class="property-modal-actions">
-                <a href="edit-property.html?id=${property._id}" class="btn btn-primary">Editar Propriedade</a>
+                <a href="new-edit.html?id=${property._id}" class="btn btn-primary">Editar Propriedade</a>
                 <button id="share-facebook-btn" class="btn btn-social btn-facebook" hidden>
                     <i class="fab fa-facebook-f"></i> Compartilhar no Facebook
                 </button>
@@ -424,8 +424,7 @@ function setupModal() {
     });
 }
 
-async function deleteProperty(event) {
-    const propertyId = event.currentTarget.getAttribute('data-id');
+async function deleteProperty(propertyId) {
     console.log('Tentando excluir propriedade com ID:', propertyId);
 
     if (confirm('Tem certeza que deseja excluir esta propriedade?')) {

@@ -48,7 +48,7 @@ function updateRecentPropertiesTable(recentProperties) {
             <td>R$ ${property.price.toLocaleString('pt-BR')}</td>
             <td>${property.status}</td>
             <td>
-                <a href="edit-property.html?id=${property._id}" class="btn btn-secondary">Editar</a>
+                <a href="new-edit.html?id=${property._id}" class="btn btn-secondary">Editar</a>
                 <button class="btn btn-danger delete-btn" data-id="${property._id}">Excluir</button>
             </td>
         `;

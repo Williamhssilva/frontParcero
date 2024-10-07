@@ -62,6 +62,12 @@ async function handleSubmit(event) {
             formData.delete(key);
         }
     }
+    // Adicionar campos booleanos explicitamente
+    const booleanFields = ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator', 'hasPromotion'];
+    booleanFields.forEach(field => {
+        formData.set(field, form.querySelector(`#${field}`).checked.toString());
+    });
+
     // Adicionar o ID do corretor atual
     formData.append('capturedBy', getCurrentUser().id);
     formData.append('capturedByName', getCurrentUser().name);

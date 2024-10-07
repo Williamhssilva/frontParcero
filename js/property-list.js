@@ -64,8 +64,7 @@ window.handlePropertyAction = function handlePropertyAction(event) {
 }
 
 window.editProperty = function editProperty(propertyId) {
-    // Implementar lógica para editar propriedade
-    window.location.href = `edit-property.html?id=${propertyId}`;
+    window.location.href = `new-edit.html?id=${propertyId}`;
 }
 
 window.deleteProperty = async function deleteProperty(propertyId) {

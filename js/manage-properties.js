@@ -446,13 +446,25 @@ async function deleteProperty(event) {
             throw new Error(errorData.message || 'Erro ao excluir propriedade');
         }
 
-        // Remover o card da propriedade do DOM
-        const propertyCard = document.querySelector(`[data-id="${propertyId}"]`);
-        if (propertyCard) {
-            propertyCard.remove();
+        // Remover a propriedade dos arrays
+        allProperties = allProperties.filter(prop => prop._id !== propertyId);
+        filteredProperties = filteredProperties.filter(prop => prop._id !== propertyId);
+
+        // Recalcular o número total de páginas
+        const totalPages = Math.ceil(filteredProperties.length / limit);
+
+        // Ajustar a página atual se necessário
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
         }
 
+        // Atualizar a exibição das propriedades
+        displayProperties(currentPage);
+
         showNotification('Propriedade excluída com sucesso', 'success');
+        
+        // Atualizar a paginação
+        updatePagination(currentPage, totalPages);
 
         // Fechar o modal se estiver aberto
         const modal = document.getElementById('property-details-modal');

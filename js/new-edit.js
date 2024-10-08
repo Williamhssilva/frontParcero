@@ -16,6 +16,13 @@ function setupForm() {
     form.addEventListener('submit', handleSubmit);
 }
 
+function updateImageOrder() {
+    const imageContainers = document.querySelectorAll('.image-preview-item');
+    imageContainers.forEach((container, index) => {
+        container.setAttribute('data-index', index);
+    });
+}
+
 async function loadPropertyData() {
     const urlParams = new URLSearchParams(window.location.search);
     const propertyId = urlParams.get('id');
@@ -271,45 +278,71 @@ function setupImagePreview(property) {
         return;
     }
 
-    existingImagesContainer.innerHTML = property.images.map((image, index) => `
-        <div class="image-preview">
-            <img src="${API_BASE_URL}${image}" alt="Imagem ${index + 1}">
-            <button type="button" class="remove-image" data-index="${index}">X</button>
-        </div>
-    `).join('');
-    
-    existingImagesContainer.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('remove-image')) {
-            e.preventDefault();
-            e.stopPropagation();
-            const index = e.target.dataset.index;
-            const imgContainer = e.target.closest('.image-preview');
-            console.log(`Botão de remoção clicado para a imagem ${index}`);
-            removeImage(index, imgContainer);
-        }
+    existingImagesContainer.innerHTML = '';
+
+    if (property && property.images && property.images.length > 0) {
+        property.images.forEach((image, index) => {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'image-preview-item';
+            imgContainer.setAttribute('data-src', image);
+
+            const img = document.createElement('img');
+            img.src = `${API_BASE_URL}${image}`;
+            img.alt = `Imagem ${index + 1}`;
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-image';
+            removeButton.textContent = 'X';
+            removeButton.onclick = () => removeImage(index, imgContainer);
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(removeButton);
+            existingImagesContainer.appendChild(imgContainer);
+        });
+    }
+
+    new Sortable(existingImagesContainer, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: updateImageOrder
     });
 
     console.log('setupImagePreview concluído');
 }
 
-function removeImage(index, imgContainer) {
-    console.log(`Marcando imagem ${index} para remoção`);
-    imgContainer.classList.add('marked-for-removal');
-    imgContainer.style.opacity = '0.5';
-    const removeButton = imgContainer.querySelector('.remove-image');
-    removeButton.textContent = 'Desfazer';
-    removeButton.onclick = () => undoRemoveImage(index, imgContainer);
-    showNotification('Imagem marcada para remoção. Clique em Salvar Alterações para confirmar.', 'info');
+function handleNewImages(event) {
+    const files = event.target.files;
+    const existingImagesContainer = document.getElementById('image-preview');
+
+    for (let file of files) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'image-preview-item';
+            imgContainer.setAttribute('data-index', existingImagesContainer.children.length);
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = `Nova Imagem ${existingImagesContainer.children.length + 1}`;
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-image';
+            removeButton.textContent = 'X';
+            removeButton.onclick = () => removeImage(existingImagesContainer.children.length, imgContainer);
+
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(removeButton);
+            existingImagesContainer.appendChild(imgContainer);
+        }
+        reader.readAsDataURL(file);
+    }
 }
 
-function undoRemoveImage(index, imgContainer) {
-    console.log(`Desmarcando imagem ${index} para remoção`);
-    imgContainer.classList.remove('marked-for-removal');
-    imgContainer.style.opacity = '1';
-    const removeButton = imgContainer.querySelector('.remove-image');
-    removeButton.textContent = 'X';
-    removeButton.onclick = () => removeImage(index, imgContainer);
-    showNotification('Remoção da imagem desfeita.', 'info');
+function removeImage(index, imgContainer) {
+    imgContainer.remove();
+    updateImageOrder();
 }
 
 async function handleSubmit(event) {
@@ -319,36 +352,32 @@ async function handleSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
     
-    // Adicionar campos booleanos explicitamente
-    const booleanFields = ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator'];
-    booleanFields.forEach(field => {
-        formData.set(field, form.querySelector(`#${field}`)?.checked.toString() || 'false');
-    });
+    // Capturar a ordem atual das imagens
+    const currentImages = Array.from(document.querySelectorAll('.image-preview-item'))
+        .map(item => item.getAttribute('data-src'))
+        .filter(src => src); // Remove valores nulos ou vazios
 
-    // Lidar com o campo hasPromotion separadamente
-    formData.set('exclusivityContract.hasPromotion', form.querySelector('#hasPromotion')?.checked.toString() || 'false');
+    console.log('Imagens atuais (ordem atualizada):', currentImages);
 
-    // Lidar com as imagens
-    const imagesToKeep = [];
-    const imagesToRemove = [];
-    currentProperty.images.forEach((image, index) => {
-        const imgContainer = document.querySelector(`.image-preview:nth-child(${index + 1})`);
-        if (imgContainer && !imgContainer.classList.contains('marked-for-removal')) {
-            imagesToKeep.push(image);
-        } else {
-            imagesToRemove.push(index);
-        }
-    });
-
-    formData.set('existingImages', JSON.stringify(imagesToKeep));
-    formData.set('imagesToRemove', JSON.stringify(imagesToRemove));
+    // Adicionar imagens existentes na ordem atual
+    if (currentImages.length > 0) {
+        formData.set('existingImages', JSON.stringify(currentImages));
+    } else {
+        // Se não houver imagens, envie um array vazio
+        formData.set('existingImages', JSON.stringify([]));
+    }
 
     // Adicionar novas imagens
     const newImagesInput = form.querySelector('#new-images');
     if (newImagesInput && newImagesInput.files.length > 0) {
         Array.from(newImagesInput.files).forEach(file => {
-            formData.append('images', file);
+            formData.append('newImages', file);
         });
+    }
+
+    // Log para verificar o conteúdo do FormData
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
     }
 
     try {
@@ -367,6 +396,7 @@ async function handleSubmit(event) {
         }
 
         const data = await response.json();
+        console.log('Resposta do servidor:', data);
 
         showNotification('Propriedade atualizada com sucesso!', 'success');
         setTimeout(() => window.location.href = 'manage-properties.html', 2000);

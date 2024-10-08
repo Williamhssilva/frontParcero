@@ -323,7 +323,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 <button id="share-instagram-btn" class="btn btn-social btn-instagram">
                     <i class="fab fa-instagram"></i> Compartilhar no Instagram
                 </button>
-                <button class="btn btn-secondary" onclick="deleteProperty('${property._id}')">Excluir Propriedade</button>
+                <button class="btn btn-secondary delete-btn" data-id="${property._id}">Excluir Propriedade</button>
             </div>
         `;
 
@@ -424,31 +424,44 @@ function setupModal() {
     });
 }
 
-async function deleteProperty(propertyId) {
-    console.log('Tentando excluir propriedade com ID:', propertyId);
+async function deleteProperty(event) {
+    event.preventDefault();
+    const propertyId = event.currentTarget.getAttribute('data-id');
+    console.log('Iniciando exclusão da propriedade:', propertyId);
 
-    if (confirm('Tem certeza que deseja excluir esta propriedade?')) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+    if (!confirm('Tem certeza que deseja excluir esta propriedade?')) {
+        return;
+    }
 
-            const responseData = await response.json();
-
-            if (!response.ok) {
-                throw new Error(`Falha ao excluir a propriedade: ${responseData.message || response.statusText}`);
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
+        });
 
-            console.log('Resposta do servidor:', responseData);
-            showNotification('Propriedade excluída com sucesso!', 'success');
-            loadAllProperties(); // Recarrega a lista de propriedades
-        } catch (error) {
-            console.error('Erro ao excluir propriedade:', error);
-            showNotification(`Erro ao excluir propriedade: ${error.message}`, 'error');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao excluir propriedade');
         }
+
+        // Remover o card da propriedade do DOM
+        const propertyCard = document.querySelector(`[data-id="${propertyId}"]`);
+        if (propertyCard) {
+            propertyCard.remove();
+        }
+
+        showNotification('Propriedade excluída com sucesso', 'success');
+
+        // Fechar o modal se estiver aberto
+        const modal = document.getElementById('property-details-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Erro ao excluir propriedade:', error);
+        showNotification(`Erro ao excluir propriedade: ${error.message}`, 'error');
     }
 }
 

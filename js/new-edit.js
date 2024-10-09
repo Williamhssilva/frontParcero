@@ -268,6 +268,8 @@ function populateForm(property) {
     form.addEventListener('submit', handleSubmit);
 }
 
+let imagesToDelete = []; // Array para armazenar imagens a serem excluídas
+
 function setupImagePreview(property) {
     console.log('Iniciando setupImagePreview com propriedade:', property);
     const existingImagesContainer = document.getElementById('image-preview');
@@ -294,7 +296,12 @@ function setupImagePreview(property) {
             removeButton.type = 'button';
             removeButton.className = 'remove-image';
             removeButton.textContent = 'X';
-            removeButton.onclick = () => removeImage(index, imgContainer);
+            removeButton.onclick = () => {
+                // Armazenar o caminho da imagem a ser excluída
+                imagesToDelete.push(image);
+                imgContainer.remove(); // Remover a imagem do DOM
+                console.log(`Imagem ${index} marcada para exclusão: ${image}`);
+            };
 
             imgContainer.appendChild(img);
             imgContainer.appendChild(removeButton);
@@ -366,6 +373,11 @@ async function handleSubmit(event) {
     } else {
         // Se não houver imagens, envie um array vazio
         formData.set('existingImages', JSON.stringify([]));
+    }
+
+    // Adicionar imagens a serem excluídas
+    if (imagesToDelete.length > 0) {
+        formData.set('imagesToDelete', JSON.stringify(imagesToDelete));
     }
 
     // Adicionar novas imagens

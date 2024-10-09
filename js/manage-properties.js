@@ -323,7 +323,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 <button id="share-instagram-btn" class="btn btn-social btn-instagram">
                     <i class="fab fa-instagram"></i> Compartilhar no Instagram
                 </button>
-                <button class="btn btn-secondary delete-btn" data-id="${property._id}">Excluir Propriedade</button>
+                <button hidden class="btn btn-secondary delete-btn" data-id="${property._id}">Excluir Propriedade</button>
             </div>
         `;
 

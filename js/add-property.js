@@ -14,14 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupForm() {
-    console.log('Configurando formulário');
     const form = document.getElementById('add-property-form');
-    console.log("Formulário encontrado:", form);
 
     if (form) {
         form.addEventListener('submit', function (event) {
             event.preventDefault(); // Impede o envio tradicional do formulário
-            console.log('Formulário submetido');
             handleSubmit(event);
         });
     } else {
@@ -33,22 +30,79 @@ function setupImagePreview() {
     const input = document.getElementById('images');
     const preview = document.getElementById('image-preview');
 
+    if (!preview) {
+        console.error('Elemento image-preview não encontrado');
+        return;
+    }
+
     input.addEventListener('change', () => {
-        preview.innerHTML = '';
         for (const file of input.files) {
             const reader = new FileReader();
             reader.onload = (e) => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'image-preview-item';
+                imgContainer.setAttribute('data-src', e.target.result);
+                const originalIndex = preview.children.length;
+                imgContainer.setAttribute('data-original-index', originalIndex);
+                imgContainer.setAttribute('data-index', originalIndex);
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.width = '100px';
-                img.style.height = '100px';
-                img.style.objectFit = 'cover';
-                img.style.margin = '5px';
-                preview.appendChild(img);
+                img.alt = file.name;
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'remove-image';
+                removeButton.textContent = 'X';
+                removeButton.onclick = () => removeImage(imgContainer);
+
+                const positionLabel = document.createElement('span');
+                positionLabel.className = 'image-position';
+                positionLabel.textContent = originalIndex + 1;
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(removeButton);
+                imgContainer.appendChild(positionLabel);
+                preview.appendChild(imgContainer);
             };
             reader.readAsDataURL(file);
         }
     });
+
+    // Inicializar Sortable
+    new Sortable(preview, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        handle: '.image-preview-item', // Isso permite arrastar pelo item inteiro
+        onEnd: function () {
+            updateImageOrder();
+        }
+    });
+}
+
+function removeImage(imgContainer) {
+    imgContainer.remove();
+    updateImageOrder();
+}
+
+function updateImageOrder() {
+    const imageContainers = document.querySelectorAll('.image-preview-item');
+    const updatedOrder = [];
+    console.log(updatedOrder);
+    imageContainers.forEach((container, index) => {
+
+        container.setAttribute('data-index', index); // Atualiza o índice
+
+        // Adiciona ao array de ordem atualizada
+        updatedOrder.push({
+            originalIndex: container.getAttribute('data-original-index'),
+            newIndex: index,
+        });
+    });
+
+    // Log da nova ordem com nomes das imagens
+    console.log('Nova ordem das imagens:', updatedOrder);
 }
 
 async function handleSubmit(event) {
@@ -56,12 +110,37 @@ async function handleSubmit(event) {
     const form = event.target;
     const formData = new FormData(form);
 
+    // Capturar a ordem atual das imagens
+    const imageContainers = Array.from(document.querySelectorAll('.image-preview-item'));
+    const currentImages = imageContainers.map((container, currentIndex) => ({
+        src: container.getAttribute('data-src'),
+        currentIndex: currentIndex,
+        originalIndex: parseInt(container.getAttribute('data-original-index'))
+    }));
+
+    // Adicionar a nova ordem das imagens como um campo separado
+    const newOrder = currentImages.map(img => img.originalIndex);
+    formData.append('imageOrder', JSON.stringify(newOrder));
+
+    // Converter data URLs para arquivos e adicionar ao FormData
+    formData.delete('images');
+    const imagePromises = currentImages.map(async (img, index) => {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        const file = new File([blob], `image_${index}.jpg`, { type: 'image/jpeg' });
+        formData.append('images', file);
+        console.log(`Adicionando ao FormData: Imagem ${index + 1} (originalmente na posição ${img.originalIndex + 1})`);
+    });
+
+    await Promise.all(imagePromises);
+
     // Remove campos vazios ou converte para null
     for (let [key, value] of formData.entries()) {
         if (value === '') {
             formData.delete(key);
         }
     }
+
     // Adicionar campos booleanos explicitamente
     const booleanFields = ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator', 'hasPromotion'];
     booleanFields.forEach(field => {
@@ -77,7 +156,18 @@ async function handleSubmit(event) {
     formData.set('hasBalcony', form.hasBalcony.checked);
     formData.set('hasElevator', form.hasElevator.checked);
     formData.set('hasPromotion', form.hasPromotion.checked);
-
+    console.log('FormData111111111:', formData);
+    
+    // Log para verificar o conteúdo do FormData
+    console.log('Conteúdo do FormData:');
+    for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+            console.log(`${key}: ${value.name} (${value.size} bytes)`); // Imprime o nome e o tamanho do arquivo
+        } else {
+            console.log(`${key}: ${value}`); // Imprime outros valores
+        }
+    }
+    
     try {
         showLoading();
         console.log('Enviando requisição para o servidor');
@@ -99,6 +189,8 @@ async function handleSubmit(event) {
 
         showNotification('Propriedade adicionada com sucesso!', 'success');
         form.reset(); // Limpa o formulário após o sucesso
+        document.getElementById('image-preview').innerHTML = ''; // Limpa as miniaturas
+        setupImagePreview();
     } catch (error) {
         console.error('Erro ao adicionar propriedade:', error);
         showNotification(`Erro ao adicionar propriedade: ${error.message}`, 'error');
@@ -158,7 +250,7 @@ function showToast(message, type) {
         setTimeout(() => {
             document.body.removeChild(toast);
         }, 300);
-    }, 3000);
+    }, 300);
 }
 
 function showNotification(message, type = 'info') {

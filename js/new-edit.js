@@ -326,6 +326,7 @@ function handleNewImages(event) {
             img.src = e.target.result;
             img.alt = `Nova Imagem ${existingImagesContainer.children.length + 1}`;
 
+            
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.className = 'remove-image';

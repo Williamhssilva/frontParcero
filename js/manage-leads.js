@@ -9,7 +9,7 @@ import { getCurrentUser, checkPermission } from './auth.js';
 let allLeads = []; // Armazenará todos os leads
 let currentLead = null; // Variável global para armazenar o lead atual
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     renderMenu();
     if (checkPermission(['corretor', 'administrador'])) {
         setupEventListeners();
@@ -53,7 +53,7 @@ function initializeDraggableScroll() {
     salesFunnel.addEventListener('mousedown', (e) => {
         // Ignora se o clique for em um card ou em um elemento dentro do card
         if (e.target.closest('.lead-card')) return;
-        
+
         isDown = true;
         salesFunnel.style.cursor = 'grabbing';
         startX = e.pageX - salesFunnel.offsetLeft;
@@ -138,17 +138,15 @@ function setupEventListeners() {
 }
 
 async function loadLeads() {
-    console.log('Token armazenado:', localStorage.getItem('token'));
-    console.log('Iniciando carregamento de leads');
     try {
         const response = await fetch(`${API_BASE_URL}/api/leads`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-        console.log('Resposta recebida:', response.status, response.statusText);
+
         const data = await response.json();
-        console.log('Dados recebidos:', data);
+
         if (response.ok) {
             allLeads = data.data;
             displayLeadsInFunnel(allLeads);
@@ -168,7 +166,7 @@ function filterLeads() {
 
     const filteredLeads = allLeads.filter(lead => {
         const matchesSearch = lead.name.toLowerCase().includes(searchTerm) ||
-                              lead.email.toLowerCase().includes(searchTerm);
+            lead.email.toLowerCase().includes(searchTerm);
         const matchesStage = !stageFilter || lead.stage === stageFilter;
         const matchesStatus = !statusFilter || lead.status === statusFilter;
         const matchesInterest = !interestFilter || lead.interest === interestFilter;
@@ -181,16 +179,22 @@ function filterLeads() {
 
 function displayLeadsInFunnel(leads) {
     const stages = ['novo', 'qualificacao', 'apresentacao', 'visita', 'negociacao', 'posvenda', 'contrato', 'concluido'];
-    
     stages.forEach(stage => {
         const stageElement = document.querySelector(`.stage-leads[data-stage="${stage}"]`);
         if (stageElement) {
-            stageElement.innerHTML = '';
+            stageElement.innerHTML = ''; // Limpa os leads existentes
             const stageLeads = leads.filter(lead => lead.stage === stage);
-            
+
             // Ordena os leads por posição
             stageLeads.sort((a, b) => a.position - b.position);
+
+            const stageTitle = document.querySelector(`#${stage} h3`);
             
+            if (stageTitle) {
+                stageTitle.textContent = `${stage.charAt(0).toUpperCase() + stage.slice(1)} (${stageLeads.length})`;
+            }
+
+            // Adiciona os leads à coluna
             stageLeads.forEach((lead, index) => {
                 lead.position = index; // Garante que as posições sejam sequenciais
                 const leadCard = createLeadCard(lead);
@@ -264,13 +268,13 @@ async function showEditLeadForm(leadId) {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             const lead = data.data;
             const form = document.getElementById('edit-lead-form');
@@ -280,7 +284,7 @@ async function showEditLeadForm(leadId) {
             form.elements.interest.value = lead.interest;
             form.elements.status.value = lead.status;
             form.setAttribute('data-lead-id', lead._id);
-            
+
             const modal = document.getElementById('edit-lead-modal');
             modal.style.display = 'block';
         } else {
@@ -300,7 +304,7 @@ async function handleFormSubmit(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    
+
     const newLead = {
         name: formData.get('name'),
         email: formData.get('email'),
@@ -466,7 +470,7 @@ async function deleteLead(leadId) {
 function populateForm(lead) {
     const form = document.getElementById('lead-form');
     form.setAttribute('data-lead-id', lead._id);
-    
+
     form.elements.name.value = lead.name;
     form.elements.email.value = lead.email;
     form.elements.phone.value = lead.phone;
@@ -476,8 +480,6 @@ function populateForm(lead) {
 
 function showLeadDetails(lead) {
     currentLead = lead; // Atualiza o lead atual
-    console.log('Detalhes do lead:', lead);
-    // Aqui você pode abrir uma modal com mais informações e opções para editar o lead
 }
 
 function showStageActions(leadId) {
@@ -486,48 +488,48 @@ function showStageActions(leadId) {
         console.error('Lead não encontrado');
         return;
     }
-    
+
     currentLead = lead; // Atualiza o lead atual
 
     const stageActions = {
         novo: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)}
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) }
         ],
         visita: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Agendar visita', action: () => scheduleVisit(lead) },
             { name: 'Preparar material de apresentação', action: () => preparePresentationMaterial(lead) }
         ],
         negociacao: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Enviar proposta', action: () => sendProposal(lead) }
         ],
         qualificacao: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como qualificado', action: () => markAsQualified(lead) }
         ],
         apresentacao: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como apresentado', action: () => markAsPresented(lead) }
         ],
         posvenda: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }
         ],
         contrato: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como contrato assinado', action: () => markAsContractSigned(lead) }
         ],
         concluido: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como concluído', action: () => markAsCompleted(lead) }
         ]
     };
@@ -637,7 +639,7 @@ async function handleEditFormSubmit(event) {
     const form = event.target;
     const leadId = form.getAttribute('data-lead-id');
     const formData = new FormData(form);
-    
+
     const updatedLead = {
         name: formData.get('name'),
         email: formData.get('email'),

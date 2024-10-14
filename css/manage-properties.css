@@ -860,3 +860,24 @@
 .pagination-button:hover:not(.active) {
     background-color: #ddd;
 }
+
+.total-count {
+    font-size: 18px; /* Tamanho da fonte */
+    color: #333; /* Cor do texto */
+    margin-bottom: 20px; /* Espaçamento inferior */
+    font-weight: bold; /* Negrito */
+    text-align: left; /* Alinhamento à esquerda */
+}
+
+#total-properties-count-value {
+    display: inline-block; /* Para permitir o uso de padding e border-radius */
+    color: white; /* Cor do texto dentro do círculo */
+    background-color: #b11e1e; /* Cor verde */
+    border-radius: 50%; /* Faz o fundo ser um círculo */
+    width: 40px; /* Largura do círculo */
+    height: 40px; /* Altura do círculo */
+    text-align: center; /* Centraliza o texto */
+    line-height: 40px; /* Alinha verticalmente o texto */
+    margin-left: 10px; /* Espaçamento à esquerda do texto */
+    font-size: 28px;
+}

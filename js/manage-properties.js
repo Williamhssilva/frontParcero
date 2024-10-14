@@ -79,21 +79,29 @@ function filterProperties(searchTerm) {
 }
 
 function displayProperties(page) {
+    const propertiesList = document.getElementById('properties-list');
+    propertiesList.innerHTML = ''; // Limpa a lista existente
+
+    // Contador de propriedades
+    let totalPropertiesCount = 0;
+
+    // Exibe as propriedades da página atual
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     const propertiesToDisplay = filteredProperties.slice(startIndex, endIndex);
 
-    const propertiesList = document.getElementById('properties-list');
-    if (!propertiesList) {
-        console.error('Elemento properties-list não encontrado na página atual');
-        return;
-    }
-    propertiesList.innerHTML = '';
-
     propertiesToDisplay.forEach(property => {
-        const propertyCard = createPropertyCard(property);
+        const propertyCard = createPropertyCard(property); // Supondo que você tenha uma função para criar o card
         propertiesList.appendChild(propertyCard);
+        totalPropertiesCount++; // Incrementa o contador
     });
+
+    // Atualiza a contagem total de propriedades
+    const totalCountElement = document.getElementById('total-properties-count-value');
+    totalCountElement.textContent = `${filteredProperties.length}`; // Exibe o total de propriedades filtradas
+
+    // Atualiza a paginação
+    updatePagination(page, Math.ceil(filteredProperties.length / limit));
 
     setupEventListeners();
 }

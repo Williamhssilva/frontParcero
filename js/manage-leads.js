@@ -180,7 +180,7 @@ function filterLeads() {
 }
 
 function displayLeadsInFunnel(leads) {
-    const stages = ['novo', 'contatoInicial', 'qualificacao', 'apresentacao', 'visita', 'negociacao', 'proposta', 'contrato', 'concluido'];
+    const stages = ['novo', 'qualificacao', 'apresentacao', 'visita', 'negociacao', 'posvenda', 'contrato', 'concluido'];
     
     stages.forEach(stage => {
         const stageElement = document.querySelector(`.stage-leads[data-stage="${stage}"]`);
@@ -494,13 +494,6 @@ function showStageActions(leadId) {
             {name: 'Excluir', action: () => deleteLead(leadId)},
             {name: 'Editar', action: () => showEditLeadForm(leadId)}
         ],
-        contatoInicial: [
-            {name: 'Excluir', action: () => deleteLead(leadId)},
-            {name: 'Editar', action: () => showEditLeadForm(leadId)},
-            { name: 'Fazer primeira chamada', action: () => scheduleCall(lead) },
-            { name: 'Enviar e-mail de boas-vindas', action: () => sendWelcomeEmail(lead) },
-            { name: 'Enviar mensagem via WhatsApp', action: () => sendWhatsAppMessage(lead.phone, `Olá ${lead.name}, tudo bem?`) }
-        ],
         visita: [
             {name: 'Excluir', action: () => deleteLead(leadId)},
             {name: 'Editar', action: () => showEditLeadForm(leadId)},
@@ -522,7 +515,7 @@ function showStageActions(leadId) {
             {name: 'Editar', action: () => showEditLeadForm(leadId)},
             { name: 'Marcar como apresentado', action: () => markAsPresented(lead) }
         ],
-        proposta: [
+        posvenda: [
             {name: 'Excluir', action: () => deleteLead(leadId)},
             {name: 'Editar', action: () => showEditLeadForm(leadId)},
             { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }

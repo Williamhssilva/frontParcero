@@ -388,6 +388,12 @@ async function handleSubmit(event) {
         });
     }
 
+    // Capturar valores dos checkboxes
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        formData.set(checkbox.name, checkbox.checked); // Adiciona o valor do checkbox ao FormData
+    });
+
     // Log para verificar o conteúdo do FormData
     for (let [key, value] of formData.entries()) {
         console.log(key, value);

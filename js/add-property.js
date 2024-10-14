@@ -10,8 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
     setupForm();
     setupImagePreview();
     renderMenu();
-    console.log('Token armazenado:', localStorage.getItem('token'));
+    toggleApartmentFields();
+
+    // Adiciona o listener para o select
+    const propertyTypeSelect = document.getElementById('propertyType');
+    propertyTypeSelect.addEventListener('change', toggleApartmentFields);
 });
+
+function toggleApartmentFields() {
+    const propertyTypeSelect = document.getElementById('propertyType');
+    const apartmentFields = document.getElementById('apartmentFields');
+    const loteFields = document.getElementById('casaFields');
+    if (propertyTypeSelect.value === 'Apartamento') {
+        loteFields.classList.remove('hidden');
+        apartmentFields.classList.remove('hidden'); // Mostra os campos de apartamento
+    } else if (propertyTypeSelect.value === 'Lote') {
+        loteFields.classList.add('hidden');
+        apartmentFields.classList.add('hidden'); // Oculta os campos de apartamento
+    } else {
+        loteFields.classList.remove('hidden');
+        apartmentFields.classList.add('hidden'); // Oculta os campos de apartamento
+    }
+}
 
 function setupForm() {
     const form = document.getElementById('add-property-form');

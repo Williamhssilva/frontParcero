@@ -27,11 +27,30 @@
             <div class="search-box">
                 <input type="text" id="property-search" placeholder="Buscar imóvel por título...">
             </div>
+            <div class="search-box">
+                <input type="text" id="neighborhood-search" placeholder="Buscar por bairro...">
+            </div>
+            <div class="search-box">
+                <select id="type-search">
+                    <option value="">Todos os tipos</option>
+                    <option value="Casa">Casa</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Lote">Lote</option>
+                    <option value="Comercial">Comercial</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <input type="text" id="min-price-search" placeholder="Valor mínimo...">
+            </div>
+            <div class="search-box">
+                <input type="text" id="max-price-search" placeholder="Valor máximo...">
+            </div>
         </div>
         <div class="manage-actions">
             <!-- botões de ação -->
             <a href="add-property.html" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Nova
                 Propriedade</a>
+                <button class="btn-clear" onclick="clearSearch()">Limpar</button>
         </div>
         <div id="total-properties-count" class="total-count">
             Total de Propriedades: <span id="total-properties-count-value">0</span>

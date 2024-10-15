@@ -21,9 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupSearch() {
     const searchInput = document.getElementById('property-search');
-    searchInput.addEventListener('input', debounce(() => {
-        filterProperties(searchInput.value);
-    }, 300));
+    const neighborhoodInput = document.getElementById('neighborhood-search');
+    const typeSelect = document.getElementById('type-search');
+    const minPriceInput = document.getElementById('min-price-search');
+    const maxPriceInput = document.getElementById('max-price-search');
+
+    searchInput.addEventListener('input', debounce(filterProperties, 300));
+    neighborhoodInput.addEventListener('input', debounce(filterProperties, 300));
+    typeSelect.addEventListener('change', filterProperties);
+    minPriceInput.addEventListener('input', filterProperties); // Chama a função de filtragem enquanto digita
+    maxPriceInput.addEventListener('input', filterProperties); // Chama a função de filtragem enquanto digita
 }
 
 function debounce(func, wait) {
@@ -69,13 +76,27 @@ async function loadAllProperties() {
     }
 }
 
-function filterProperties(searchTerm) {
-    filteredProperties = allProperties.filter(property =>
-        property.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    currentPage = 1;
-    displayProperties(currentPage);
-    updatePagination(currentPage, Math.ceil(filteredProperties.length / limit));
+function filterProperties() {
+    const searchTerm = document.getElementById('property-search').value.toLowerCase();
+    const neighborhoodTerm = document.getElementById('neighborhood-search').value.toLowerCase();
+    const typeTerm = document.getElementById('type-search').value;
+    const minPriceTerm = parseFloat(document.getElementById('min-price-search').value) || 0; // Converte para número
+    const maxPriceTerm = parseFloat(document.getElementById('max-price-search').value) || Infinity; // Converte para número
+
+    filteredProperties = allProperties.filter(property => {
+        const titleMatch = property.title.toLowerCase().includes(searchTerm);
+        const neighborhoodMatch = property.neighborhood && property.neighborhood.toLowerCase().includes(neighborhoodTerm);
+        const typeMatch = typeTerm ? property.propertyType === typeTerm : true;
+
+        // Verifica se o preço está dentro do intervalo especificado
+        const priceMatch = (property.salePrice >= minPriceTerm) && (property.salePrice <= maxPriceTerm);
+
+        return titleMatch && neighborhoodMatch && typeMatch && priceMatch;
+    });
+
+    currentPage = 1; // Reseta a página para 1 após a pesquisa
+    displayProperties(currentPage); // Atualiza a exibição das propriedades
+    updatePagination(currentPage, Math.ceil(filteredProperties.length / limit)); // Atualiza a paginação
 }
 
 function displayProperties(page) {
@@ -570,5 +591,18 @@ function shareOnInstagram(property) {
         console.error('Erro ao copiar texto: ', err);
     });
 }
+
+function clearSearch() {
+    document.getElementById('property-search').value = '';
+    document.getElementById('neighborhood-search').value = '';
+    document.getElementById('type-search').value = '';
+    document.getElementById('min-price-search').value = '';
+    document.getElementById('max-price-search').value = '';
+    
+    // Chama a função de filtragem para atualizar a lista
+    filterProperties();
+}
+
+window.clearSearch = clearSearch; // Torna a função acessível globalmente
 
 export { loadAllProperties };

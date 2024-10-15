@@ -881,3 +881,68 @@
     margin-left: 10px; /* Espaçamento à esquerda do texto */
     font-size: 28px;
 }
+
+/* Estilização geral do contêiner de pesquisa */
+.search-area {
+    display: flex;
+    flex-wrap: wrap; /* Permite que os itens se movam para a próxima linha em telas menores */
+    gap: 10px; /* Espaçamento entre os campos */
+    margin: 20px 0; /* Margem superior e inferior */
+}
+
+/* Estilização dos campos de entrada */
+.search-box {
+    flex: 1; /* Faz com que os campos ocupem espaço igual */
+    min-width: 100px; /* Largura mínima para os campos */
+    max-width: 200px; /* Largura máxima para os campos */
+}
+
+input[type="text"],
+select {
+    width: 100%; /* Faz com que os campos ocupem 100% da largura do contêiner */
+    padding: 10px; /* Espaçamento interno */
+    border: 1px solid #ccc; /* Borda padrão */
+    border-radius: 5px; /* Bordas arredondadas */
+    font-size: 16px; /* Tamanho da fonte */
+    transition: border-color 0.3s; /* Transição suave para a cor da borda */
+}
+
+/* Efeito de foco nos campos */
+input[type="text"]:focus,
+select:focus {
+    border-color: #007bff; /* Cor da borda ao focar */
+    outline: none; /* Remove o contorno padrão */
+}
+
+/* Estilização dos botões */
+.search-buttons {
+    display: flex; /* Alinha os botões horizontalmente */
+    gap: 10px; /* Espaçamento entre os botões */
+}
+
+.btn-search,
+.btn-clear {
+    background-color: #007bff; /* Cor de fundo do botão */
+    color: white; /* Cor do texto */
+    border: none; /* Remove a borda padrão */
+    border-radius: 5px; /* Bordas arredondadas */
+    padding: 10px 15px; /* Espaçamento interno */
+    cursor: pointer; /* Muda o cursor para indicar que é clicável */
+    font-size: 16px; /* Tamanho da fonte */
+    transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+}
+
+/* Efeito de hover nos botões */
+.btn-search:hover,
+.btn-clear:hover {
+    background-color: #0056b3; /* Cor de fundo ao passar o mouse */
+}
+
+/* Estilização do botão de limpar */
+.btn-clear {
+    background-color: #dc3545; /* Cor de fundo do botão de limpar */
+}
+
+.btn-clear:hover {
+    background-color: #c82333; /* Cor de fundo ao passar o mouse no botão de limpar */
+}

@@ -178,7 +178,7 @@ function filterLeads() {
 }
 
 function displayLeadsInFunnel(leads) {
-    const stages = ['novo', 'qualificacao', 'apresentacao', 'visita', 'negociacao', 'posvenda', 'contrato', 'concluido'];
+    const stages = ['novo', 'qualificacao', 'apresentacao', 'visita', 'negociacao', 'contrato', 'concluido', 'posvenda'];
     stages.forEach(stage => {
         const stageElement = document.querySelector(`.stage-leads[data-stage="${stage}"]`);
         if (stageElement) {
@@ -517,11 +517,6 @@ function showStageActions(leadId) {
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como apresentado', action: () => markAsPresented(lead) }
         ],
-        posvenda: [
-            { name: 'Excluir', action: () => deleteLead(leadId) },
-            { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }
-        ],
         contrato: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
@@ -531,6 +526,11 @@ function showStageActions(leadId) {
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como concluído', action: () => markAsCompleted(lead) }
+        ],
+        posvenda: [
+            { name: 'Excluir', action: () => deleteLead(leadId) },
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
+            { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }
         ]
     };
 

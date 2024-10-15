@@ -33,7 +33,7 @@ async function loadPropertyData() {
     }
 
     try {
-     
+
         const response = await fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -68,8 +68,10 @@ async function loadPropertyData() {
 
 function populateForm(property) {
     const form = document.getElementById('edit-property-form');
-    form.innerHTML = `
-        
+    form.innerHTML = ''; // Limpa o formulário antes de preencher
+
+    // Exibição da Propriedade
+    form.innerHTML += `
         <div class="form-group">
             <label for="title">Título da Propriedade</label>
             <input type="text" id="title" name="title" value="${property.title || ''}" required>
@@ -78,18 +80,23 @@ function populateForm(property) {
             <label for="description">Descrição da Propriedade</label>
             <textarea id="description" name="description" required>${property.description || ''}</textarea>
         </div>
-
-        <h2>Informações de Captação</h2>
         <div class="form-group">
-            <label for="captureCity">Cidade de Captação</label>
+            <label for="salePrice">Preço de Venda</label>
+            <input type="number" id="salePrice" name="salePrice" value="${property.salePrice || ''}" required>
+        </div>
+        <div class="form-group">
+            <label for="desiredNetPrice">Preço Líquido Desejado</label>
+            <input type="number" id="desiredNetPrice" name="desiredNetPrice" value="${property.desiredNetPrice || ''}">
+        </div>
+        <h2>Localização do Imóvel</h2>
+        <div class="form-group">
+            <label for="captureCity">Cidade</label>
             <input type="text" id="captureCity" name="captureCity" value="${property.captureCity || ''}" required>
         </div>
         <div class="form-group">
-            <label for="captureCEP">CEP de Captação</label>
+            <label for="captureCEP">CEP</label>
             <input type="text" id="captureCEP" name="captureCEP" value="${property.captureCEP || ''}" required>
         </div>
-
-        <h2>Localização do Imóvel</h2>
         <div class="form-group">
             <label for="address">Endereço</label>
             <input type="text" id="address" name="address" value="${property.address || ''}" required>
@@ -99,18 +106,9 @@ function populateForm(property) {
             <input type="text" id="neighborhood" name="neighborhood" value="${property.neighborhood || ''}" required>
         </div>
         <div class="form-group">
-            <label for="isCondominium">Condomínio?</label>
-            <input type="checkbox" id="isCondominium" name="isCondominium" ${property.isCondominium ? 'checked' : ''}>
-        </div>
-        <div class="form-group">
             <label for="block">Quadra</label>
             <input type="text" id="block" name="block" value="${property.block || ''}">
-        </div>
-        <div class="form-group">
-            <label for="apartmentNumber">Número do Apartamento</label>
-            <input type="text" id="apartmentNumber" name="apartmentNumber" value="${property.apartmentNumber || ''}">
-        </div>
-
+        </div>       
         <h2>Características do Imóvel</h2>
         <div class="form-group">
             <label for="propertyType">Tipo de Imóvel</label>
@@ -129,6 +127,10 @@ function populateForm(property) {
                 <option value="Sobrado" ${property.secondaryType === 'Sobrado' ? 'selected' : ''}>Sobrado</option>
                 <option value="Condomínio" ${property.secondaryType === 'Condomínio' ? 'selected' : ''}>Condomínio</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label for="isCondominium">Condomínio?</label>
+            <input type="checkbox" id="isCondominium" name="isCondominium" ${property.isCondominium ? 'checked' : ''}>
         </div>
         <div class="form-group">
             <label for="totalArea">Área Total (m²)</label>
@@ -164,19 +166,26 @@ function populateForm(property) {
             <label for="hasBalcony">Possui Varanda?</label>
             <input type="checkbox" id="hasBalcony" name="hasBalcony" ${property.hasBalcony ? 'checked' : ''}>
         </div>
-        <div class="form-group">
-            <label for="hasElevator">Possui Elevador?</label>
-            <input type="checkbox" id="hasElevator" name="hasElevator" ${property.hasElevator ? 'checked' : ''}>
-        </div>
-        <div class="form-group">
-            <label for="floors">Número de Andares</label>
-            <input type="number" id="floors" name="floors" value="${property.floors || ''}">
-        </div>
-        <div class="form-group">
-            <label for="floor">Andar do Apartamento</label>
-            <input type="number" id="floor" name="floor" value="${property.floor || ''}">
-        </div>
 
+        <div id="apartmentFields" class="hidden">
+            <h2>Informações do Apartamento</h2>
+            <div class="form-group">
+                <label for="floors">Número de Andares</label>
+                <input type="number" id="floors" name="floors" value="${property.floors || ''}">
+            </div>
+            <div class="form-group">
+                <label for="apartmentNumber">Número do Apartamento</label>
+                <input type="text" id="apartmentNumber" name="apartmentNumber" value="${property.apartmentNumber || ''}">
+            </div>
+            <div class="form-group">
+                <label for="floor">Andar do Apartamento</label>
+                <input type="number" id="floor" name="floor" value="${property.floor || ''}">
+            </div>
+            <div class="form-group">
+                <label for="hasElevator">Possui Elevador?</label>
+                <input type="checkbox" id="hasElevator" name="hasElevator" ${property.hasElevator ? 'checked' : ''}>
+            </div>
+        </div>
         <h2>Informações de Visita</h2>
         <div class="form-group">
             <label for="occupancyStatus">Status de Ocupação</label>
@@ -197,16 +206,6 @@ function populateForm(property) {
         <div class="form-group">
             <label for="ownerContact">Contato do Proprietário</label>
             <input type="text" id="ownerContact" name="ownerContact" value="${property.ownerContact || ''}" required>
-        </div>
-
-        <h2>Informações Financeiras</h2>
-        <div class="form-group">
-            <label for="salePrice">Preço de Venda</label>
-            <input type="number" id="salePrice" name="salePrice" value="${property.salePrice || ''}" required>
-        </div>
-        <div class="form-group">
-            <label for="desiredNetPrice">Preço Líquido Desejado</label>
-            <input type="number" id="desiredNetPrice" name="desiredNetPrice" value="${property.desiredNetPrice || ''}">
         </div>
 
         <h2>Contrato de Exclusividade</h2>
@@ -247,6 +246,13 @@ function populateForm(property) {
         <button type="submit" class="submit-btn">Salvar Alterações</button>
     `;
 
+    // Adicione o event listener para o select após a criação do elemento
+    const propertyTypeSelect = document.getElementById('propertyType');
+    propertyTypeSelect.addEventListener('change', toggleApartmentFields);
+    
+    // Chame a função para definir o estado inicial dos campos
+    toggleApartmentFields();
+
     // Crie o elemento image-preview se ele não existir
     let imagePreviewElement = document.getElementById('image-preview');
     if (!imagePreviewElement) {
@@ -274,7 +280,7 @@ function setupImagePreview(property) {
     console.log('Iniciando setupImagePreview com propriedade:', property);
     const existingImagesContainer = document.getElementById('image-preview');
     console.log('Elemento image-preview:', existingImagesContainer);
-    
+
     if (!existingImagesContainer) {
         console.error('Elemento image-preview não encontrado');
         return;
@@ -324,7 +330,7 @@ function handleNewImages(event) {
 
     for (let file of files) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             const imgContainer = document.createElement('div');
             imgContainer.className = 'image-preview-item';
             imgContainer.setAttribute('data-index', existingImagesContainer.children.length);
@@ -333,7 +339,7 @@ function handleNewImages(event) {
             img.src = e.target.result;
             img.alt = `Nova Imagem ${existingImagesContainer.children.length + 1}`;
 
-            
+
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.className = 'remove-image';
@@ -359,7 +365,7 @@ async function handleSubmit(event) {
 
     const form = event.target;
     const formData = new FormData(form);
-    
+
     // Capturar a ordem atual das imagens
     const currentImages = Array.from(document.querySelectorAll('.image-preview-item'))
         .map(item => item.getAttribute('data-src'))
@@ -439,5 +445,22 @@ function showNotification(message, type = 'info') {
     // Implementação da notificação
 }
 
+function toggleApartmentFields() {
+    const propertyTypeSelect = document.getElementById('propertyType');
+    const apartmentFields = document.getElementById('apartmentFields');
+    const hasElevatorField = document.getElementById('hasElevator');
+    const floorsField = document.getElementById('floors');
+    const floorField = document.getElementById('floor');
 
-// Adicione aqui outras funções auxiliares conforme necessário
+    if (propertyTypeSelect.value === 'Apartamento') {
+        apartmentFields.classList.remove('hidden'); // Mostra os campos de apartamento
+        hasElevatorField.parentElement.classList.remove('hidden'); // Mostra o campo de elevador
+        floorsField.parentElement.classList.remove('hidden'); // Mostra o campo de andares
+        floorField.parentElement.classList.remove('hidden'); // Mostra o campo de andar
+    } else {
+        apartmentFields.classList.add('hidden'); // Oculta os campos de apartamento
+        hasElevatorField.parentElement.classList.add('hidden'); // Oculta o campo de elevador
+        floorsField.parentElement.classList.add('hidden'); // Oculta o campo de andares
+        floorField.parentElement.classList.add('hidden'); // Oculta o campo de andar
+    }
+}

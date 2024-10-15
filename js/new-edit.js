@@ -241,7 +241,7 @@ function populateForm(property) {
             <input type="file" id="images" name="images" multiple accept="image/*">
         </div>
         <h2>Imagens</h2>
-        
+        <div id="image-preview" class="image-preview-container"></div>
 
         <button type="submit" class="submit-btn">Salvar Alterações</button>
     `;
@@ -277,9 +277,7 @@ function populateForm(property) {
 let imagesToDelete = []; // Array para armazenar imagens a serem excluídas
 
 function setupImagePreview(property) {
-    console.log('Iniciando setupImagePreview com propriedade:', property);
     const existingImagesContainer = document.getElementById('image-preview');
-    console.log('Elemento image-preview:', existingImagesContainer);
 
     if (!existingImagesContainer) {
         console.error('Elemento image-preview não encontrado');

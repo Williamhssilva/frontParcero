@@ -37,19 +37,23 @@ async function fetchPropertyDetails(propertyId) {
         console.log('URL da requisição:', url);
         
         const response = await authenticatedFetch(url);
-        console.log('Status da resposta:', response.status);
+        console.log('Resposta da API:', response);
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            console.error('Erro ao buscar detalhes da propriedade:', errorData);
+            throw new Error(`Erro: ${errorData.message || 'Erro desconhecido'}`);
         }
         
         const data = await response.json();
         console.log('Dados recebidos da API:', data);
         
-        if (data.success && data.data) {
-            displayPropertyDetails(data.data);
-            loadSimilarProperties(data.data);
+        // Ajuste aqui para acessar a propriedade corretamente
+        if (data.status === 'success' && data.data) {
+            displayPropertyDetails(data.data); // Acesse data.data diretamente
+            loadSimilarProperties(data.data); // Acesse data.data diretamente
         } else {
+            console.error('Dados recebidos:', data); // Log para depuração
             throw new Error('Formato de dados inválido ou propriedade não encontrada');
         }
     } catch (error) {
@@ -62,28 +66,28 @@ function displayPropertyDetails(property) {
     console.log('Propriedade recebida para exibição:', property);
     
     // Atualizar título e endereço
-    document.getElementById('property-title').textContent = property.title || 'Título não disponível';
-    document.getElementById('property-address').textContent = `${property.address || ''}, ${property.neighborhood || ''}, ${property.captureCity || ''}`;
+    document.getElementById('property-title').textContent = property.property.title || 'Título não disponível';
+    document.getElementById('property-address').textContent = `${property.property.address || ''}, ${property.property.neighborhood || ''}, ${property.property.captureCity || ''}`;
 
     // Atualizar galeria de imagens
-    updatePropertyImages(property.images || []);
+    updatePropertyImages(property.property.images || []);
 
     // Atualizar preço
-    document.getElementById('property-price').textContent = `R$ ${property.salePrice ? property.salePrice.toLocaleString('pt-BR') : 'Preço não informado'}`;
+    document.getElementById('property-price').textContent = `R$ ${property.property.salePrice ? property.property.salePrice.toLocaleString('pt-BR') : 'Preço não informado'}`;
 
     // Atualizar características
     const featuresContainer = document.getElementById('property-features');
     featuresContainer.innerHTML = `
-        <div class="feature"><i class="fas fa-bed"></i> ${property.bedrooms || 0} quartos</div>
-        <div class="feature"><i class="fas fa-bath"></i> ${property.bathrooms || 0} banheiros</div>
-        <div class="feature"><i class="fas fa-ruler-combined"></i> ${property.totalArea || 0} m² total</div>
-        <div class="feature"><i class="fas fa-vector-square"></i> ${property.builtArea || 0} m² construídos</div>
-        <div class="feature"><i class="fas fa-car"></i> ${property.garages || 0} vagas</div>
-        <div class="feature"><i class="fas fa-building"></i> ${property.propertyType || 'Tipo não informado'}</div>
+        <div class="feature"><i class="fas fa-bed"></i> ${property.property.bedrooms || 0} quartos</div>
+        <div class="feature"><i class="fas fa-bath"></i> ${property.property.socialBathrooms || 0} banheiros</div> 
+        <div class="feature"><i class="fas fa-ruler-combined"></i> ${property.property.totalArea || 0} m² total</div>
+        <div class="feature"><i class="fas fa-vector-square"></i> ${property.property.builtArea || 0} m² construídos</div>
+        <div class="feature"><i class="fas fa-car"></i> ${property.property.garages || 0} vagas</div> 
+        <div class="feature"><i class="fas fa-building"></i> ${property.property.propertyType || 'Tipo não informado'}</div>
     `;
 
     // Atualizar descrição
-    document.getElementById('property-description-text').textContent = property.description || 'Descrição não disponível';
+    document.getElementById('property-description-text').textContent = property.property.description || 'Descrição não disponível';
 
     // Atualizar detalhes
     const detailsContainer = document.getElementById('property-details-list');
@@ -92,55 +96,55 @@ function displayPropertyDetails(property) {
             <div class="details-column">
                 <h3>Informações Básicas</h3>
                 <ul>
-                    <li><i class="fas fa-home"></i> Tipo: ${property.propertyType || 'Não informado'}</li>
-                    <li><i class="fas fa-chart-area"></i> Área total: ${property.totalArea || 0} m²</li>
-                    <li><i class="fas fa-vector-square"></i> Área construída: ${property.builtArea || 0} m²</li>
-                    <li><i class="fas fa-bed"></i> Quartos: ${property.bedrooms || 0}</li>
-                    <li><i class="fas fa-bath"></i> Banheiros: ${property.bathrooms || 0}</li>
-                    <li><i class="fas fa-car"></i> Vagas: ${property.garages || 0}</li>
+                    <li><i class="fas fa-home"></i> Tipo: ${property.property.propertyType || 'Não informado'}</li>
+                    <li><i class="fas fa-chart-area"></i> Área total: ${property.property.totalArea || 0} m²</li>
+                    <li><i class="fas fa-vector-square"></i> Área construída: ${property.property.builtArea || 0} m²</li>
+                    <li><i class="fas fa-bed"></i> Quartos: ${property.property.bedrooms || 0}</li>
+                    <li><i class="fas fa-bath"></i> Banheiros: ${property.property.socialBathrooms || 0}</li> 
+                    <li><i class="fas fa-car"></i> Vagas: ${property.property.garages || 0}</li> 
                 </ul>
             </div>
             <div class="details-column">
                 <h3>Características Adicionais</h3>
                 <ul>
-                    <li><i class="fas fa-calendar-alt"></i> Ano de construção: ${property.yearOfConstruction || 'Não informado'}</li>
-                    <li><i class="fas fa-sun"></i> Orientação solar: ${property.solarOrientation || 'Não informado'}</li>
-                    <li><i class="fas fa-building"></i> Andar: ${property.floor || 'Não informado'}</li>
+                    <li><i class="fas fa-calendar-alt"></i> Ano de construção: ${property.property.yearOfConstruction || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
+                    <li><i class="fas fa-sun"></i> Orientação solar: ${property.property.solarOrientation || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
+                    <li><i class="fas fa-building"></i> Andar: ${property.property.floor || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
                 </ul>
             </div>
             <div class="details-column">
                 <h3>Informações Financeiras</h3>
                 <ul>
-                    <li><i class="fas fa-dollar-sign"></i> Condomínio: R$ ${property.condominiumFee ? property.condominiumFee.toLocaleString('pt-BR') : 'Não informado'}</li>
-                    <li><i class="fas fa-file-invoice-dollar"></i> IPTU: R$ ${property.iptu ? property.iptu.toLocaleString('pt-BR') : 'Não informado'}</li>
+                    <li><i class="fas fa-dollar-sign"></i> Condomínio: R$ ${property.property.condominiumFee ? property.property.condominiumFee.toLocaleString('pt-BR') : 'Não informado'}</li> <!-- Verifique se existe no modelo -->
+                    <li><i class="fas fa-file-invoice-dollar"></i> IPTU: R$ ${property.property.iptu ? property.property.iptu.toLocaleString('pt-BR') : 'Não informado'}</li> <!-- Verifique se existe no modelo -->
                 </ul>
             </div>
         </div>
     `;
 
     // Adicionar comodidades se disponíveis
-    if (property.amenities && property.amenities.length > 0) {
+    if (property.property.amenities && property.property.amenities.length > 0) {
         const amenitiesColumn = document.createElement('div');
         amenitiesColumn.className = 'details-column';
         amenitiesColumn.innerHTML = `
             <h3>Comodidades</h3>
             <ul>
-                ${property.amenities.map(amenity => `<li><i class="fas fa-check"></i> ${amenity}</li>`).join('')}
+                ${property.property.amenities.map(amenity => `<li><i class="fas fa-check"></i> ${amenity}</li>`).join('')}
             </ul>
         `;
         detailsContainer.querySelector('.details-grid').appendChild(amenitiesColumn);
     }
 
     // Configurar botões de ação
-    document.getElementById('request-visit-btn').onclick = () => requestVisit(property._id);
-    document.getElementById('favorite-btn').onclick = () => toggleFavorite(property._id);
+    document.getElementById('request-visit-btn').onclick = () => requestVisit(property.property._id);
+    document.getElementById('favorite-btn').onclick = () => toggleFavorite(property.property._id);
 
     // Exibir data de captura e corretor responsável
     const captureInfo = document.createElement('div');
     captureInfo.className = 'capture-info';
     captureInfo.innerHTML = `
-        <p>Capturado em: ${new Date(property.captureDate).toLocaleDateString('pt-BR')}</p>
-        <p>Corretor responsável: ${property.capturedByName || 'Não informado'}</p>
+        <p>Capturado em: ${new Date(property.property.captureDate).toLocaleDateString('pt-BR')}</p>
+        <p>Corretor responsável: ${property.property.capturedByName || 'Não informado'}</p>
     `;
     document.getElementById('property-details').appendChild(captureInfo);
 }
@@ -207,7 +211,7 @@ function initializeCarousel() {
 
 async function loadSimilarProperties(property) {
     try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties/${property._id}/similar`);
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties/${property.property._id}/similar`);
         if (!response.ok) {
             throw new Error('Falha ao carregar propriedades similares');
         }
@@ -242,17 +246,17 @@ function displaySimilarProperties(properties) {
     }
 
     propertiesGrid.innerHTML = properties.map(property => `
-        <div class="property-card" onclick="window.location.href='property-details.html?id=${property._id}'">
-            <div class="property-image" style="background-image: url('${property.images && property.images.length > 0 ? property.images[0] : 'https://via.placeholder.com/300x200.png?text=Imóvel+Similar'}')"></div>
+        <div class="property-card" onclick="window.location.href='property-details.html?id=${property.property._id}'">
+            <div class="property-image" style="background-image: url('${property.property.images && property.property.images.length > 0 ? property.property.images[0] : 'https://via.placeholder.com/300x200.png?text=Imóvel+Similar'}')"></div>
             <div class="property-card-info">
-                <h3 class="property-card-title">${property.title || 'Título não disponível'}</h3>
-                <p class="property-card-price">${property.salePrice ? `R$ ${property.salePrice.toLocaleString('pt-BR')}` : 'Preço não informado'}</p>
+                <h3 class="property-card-title">${property.property.title || 'Título não disponível'}</h3>
+                <p class="property-card-price">${property.property.salePrice ? `R$ ${property.property.salePrice.toLocaleString('pt-BR')}` : 'Preço não informado'}</p>
                 <p class="property-card-details">
-                    ${property.bedrooms || 0} quartos | 
-                    ${property.bathrooms || 0} banheiros | 
-                    ${property.totalArea ? `${property.totalArea} m²` : 'Área não informada'}
+                    ${property.property.bedrooms || 0} quartos | 
+                    ${property.property.socialBathrooms || 0} banheiros | 
+                    ${property.property.totalArea ? `${property.property.totalArea} m²` : 'Área não informada'}
                 </p>
-                <p class="property-card-address">${property.neighborhood || ''} ${property.captureCity ? `, ${property.captureCity}` : ''}</p>
+                <p class="property-card-address">${property.property.neighborhood || ''} ${property.property.captureCity ? `, ${property.property.captureCity}` : ''}</p>
             </div>
         </div>
     `).join('');

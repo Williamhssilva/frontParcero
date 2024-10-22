@@ -78,11 +78,11 @@ function populateForm(property) {
         </div>
         <div class="form-group">
             <label for="description">Descrição da Propriedade</label>
-            <textarea id="description" name="description" required>${property.description || ''}</textarea>
+            <textarea id="description" name="description">${property.description || ''}</textarea>
         </div>
         <div class="form-group">
             <label for="salePrice">Preço de Venda</label>
-            <input type="number" id="salePrice" name="salePrice" value="${property.salePrice || ''}" required>
+            <input type="number" id="salePrice" name="salePrice" value="${property.salePrice || ''}">
         </div>
         <div class="form-group">
             <label for="desiredNetPrice">Preço Líquido Desejado</label>
@@ -91,19 +91,19 @@ function populateForm(property) {
         <h2>Localização do Imóvel</h2>
         <div class="form-group">
             <label for="captureCity">Cidade</label>
-            <input type="text" id="captureCity" name="captureCity" value="${property.captureCity || ''}" required>
+            <input type="text" id="captureCity" name="captureCity" value="${property.captureCity || ''}">
         </div>
         <div class="form-group">
             <label for="captureCEP">CEP</label>
-            <input type="text" id="captureCEP" name="captureCEP" value="${property.captureCEP || ''}" required>
+            <input type="text" id="captureCEP" name="captureCEP" value="${property.captureCEP || ''}">
         </div>
         <div class="form-group">
             <label for="address">Endereço</label>
-            <input type="text" id="address" name="address" value="${property.address || ''}" required>
+            <input type="text" id="address" name="address" value="${property.address || ''}">
         </div>
         <div class="form-group">
             <label for="neighborhood">Bairro</label>
-            <input type="text" id="neighborhood" name="neighborhood" value="${property.neighborhood || ''}" required>
+            <input type="text" id="neighborhood" name="neighborhood" value="${property.neighborhood || ''}">
         </div>
         <div class="form-group">
             <label for="block">Quadra</label>
@@ -134,29 +134,29 @@ function populateForm(property) {
         </div>
         <div class="form-group">
             <label for="totalArea">Área Total (m²)</label>
-            <input type="number" id="totalArea" name="totalArea" value="${property.totalArea || ''}" required>
+            <input type="number" id="totalArea" name="totalArea" value="${property.totalArea || ''}">
         </div>
         <div class="form-group">
             <label for="builtArea">Área Construída (m²)</label>
-            <input type="number" id="builtArea" name="builtArea" value="${property.builtArea || ''}" required>
+            <input type="number" id="builtArea" name="builtArea" value="${property.builtArea || ''}">
         </div>
 
         <h2>Tipologia do Imóvel</h2>
         <div class="form-group">
             <label for="garages">Vagas</label>
-            <input type="number" id="garages" name="garages" value="${property.garages || ''}" required>
+            <input type="number" id="garages" name="garages" value="${property.garages || ''}">
         </div>
         <div class="form-group">
             <label for="bedrooms">Quartos</label>
-            <input type="number" id="bedrooms" name="bedrooms" value="${property.bedrooms || ''}" required>
+            <input type="number" id="bedrooms" name="bedrooms" value="${property.bedrooms || ''}">
         </div>
         <div class="form-group">
             <label for="suites">Suítes</label>
-            <input type="number" id="suites" name="suites" value="${property.suites || ''}" required>
+            <input type="number" id="suites" name="suites" value="${property.suites || ''}">
         </div>
         <div class="form-group">
             <label for="socialBathrooms">Banheiros Sociais</label>
-            <input type="number" id="socialBathrooms" name="socialBathrooms" value="${property.socialBathrooms || ''}" required>
+            <input type="number" id="socialBathrooms" name="socialBathrooms" value="${property.socialBathrooms || ''}">
         </div>
         <div class="form-group">
             <label for="hasBackyard">Possui Quintal?</label>
@@ -201,11 +201,11 @@ function populateForm(property) {
         </div>
         <div class="form-group">
             <label for="ownerName">Nome do Proprietário</label>
-            <input type="text" id="ownerName" name="ownerName" value="${property.ownerName || ''}" required>
+            <input type="text" id="ownerName" name="ownerName" value="${property.ownerName || ''}">
         </div>
         <div class="form-group">
             <label for="ownerContact">Contato do Proprietário</label>
-            <input type="text" id="ownerContact" name="ownerContact" value="${property.ownerContact || ''}" required>
+            <input type="text" id="ownerContact" name="ownerContact" value="${property.ownerContact || ''}">
         </div>
 
         <h2>Contrato de Exclusividade</h2>

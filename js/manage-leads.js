@@ -154,8 +154,8 @@ async function loadLeads() {
         const data = await response.json();
 
         if (response.ok) {
-            allLeads = data.data; // Armazena os leads recebidos
-            displayLeadsInFunnel(allLeads); // Exibe os leads na interface
+            allLeads = data.data;
+            displayLeadsInFunnel(allLeads);
         } else {
             console.error('Erro ao carregar leads:', data.error);
         }

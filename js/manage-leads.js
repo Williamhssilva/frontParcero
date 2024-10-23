@@ -229,11 +229,13 @@ function createLeadCard(lead) {
             <p class="lead-interest">
                 <i class="fas fa-home"></i> ${lead.interest}
             </p>
+            ${getCurrentUser().role === 'administrador' ? `<p class="lead-captured-by"><i class="fas fa-user"></i> Cadastrado por: ${lead.capturedByName}</p>` : ''}
         </div>
         <div class="lead-card-footer">
             <button class="btn btn-actions">Ações</button>
         </div>
     `;
+
     const actionButton = card.querySelector('.btn-actions');
     actionButton.addEventListener('click', (e) => {
         e.stopPropagation(); // Impede que o evento de clique se propague para o card

@@ -226,7 +226,7 @@ function updateLeadsChart(leadsByStatus) {
         data: {
             labels: Object.keys(leadsByStatus),
             datasets: [{
-                label: 'Leads por Status',
+                label: 'Leads por Estágio',
                 data: Object.values(leadsByStatus),
                 backgroundColor: 'rgba(75, 192, 192, 0.8)',
             }]

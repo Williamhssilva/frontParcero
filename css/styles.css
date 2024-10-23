@@ -267,12 +267,17 @@ header {
     position: fixed;
     top: 20px;
     right: 20px;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 15px 25px;
+    border-radius: 4px;
     color: white;
+    font-weight: bold;
+    z-index: 10000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    max-width: 300px;
+    word-wrap: break-word;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 1000;
+    transition: opacity 0.3s ease-in-out;
 }
 
 .notification.show {
@@ -280,15 +285,15 @@ header {
 }
 
 .notification.success {
-    background-color: #4CAF50;
+    background-color: #52c41a;
 }
 
 .notification.error {
-    background-color: #f44336;
+    background-color: #f5222d;
 }
 
 .notification.info {
-    background-color: #2196F3;
+    background-color: #1890ff;
 }
 
 .property-image-container {

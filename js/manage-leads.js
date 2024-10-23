@@ -1,5 +1,5 @@
 import { API_BASE_URL } from './config.js';
-import { renderMenu } from './menu.js';
+import { renderMenu, showNotification } from './menu.js';
 
 
 import { getCurrentUser, checkPermission } from './auth.js';
@@ -16,6 +16,18 @@ document.addEventListener('DOMContentLoaded', function () {
         initializeDraggableScroll(); // Adicione esta linha
     }
 });
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 function initializeSortable() {
     const stages = document.querySelectorAll('.stage-leads');
@@ -340,10 +352,10 @@ async function handleFormSubmit(event) {
         allLeads.push(addedLead.data);
         displayLeadsInFunnel(allLeads);
         closeAddLeadForm();
-        alert('Lead adicionado com sucesso!');
+        showNotification('Lead adicionado com sucesso!', 'success');
     } catch (error) {
         console.error('Erro ao adicionar lead:', error);
-        alert('Erro ao adicionar lead. Por favor, tente novamente.');
+        showNotification('Erro ao adicionar lead. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -364,9 +376,10 @@ async function updateLeadStatus(leadId, newStatus) {
 
         // Recarregar leads após atualização bem-sucedida
         loadLeads();
+        showNotification(`Status do lead atualizado para ${newStatus}`, 'success');
     } catch (error) {
         console.error('Erro ao atualizar status do lead:', error);
-        alert('Erro ao atualizar status do lead. Por favor, tente novamente.');
+        showNotification('Erro ao atualizar status do lead. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -442,10 +455,11 @@ async function updateLeadStage(leadId, newStage, newIndex) {
             displayLeadsInFunnel(allLeads);
         }
 
+        showNotification(`Lead movido para o estágio ${newStage}`, 'success');
     } catch (error) {
         console.error('Erro ao atualizar estágio do lead:', error);
-        alert('Erro ao atualizar estágio do lead. A página será recarregada.');
-        location.reload(); // Recarrega a página em caso de erro para garantir sincronização
+        showNotification('Erro ao atualizar estágio do lead. A página será recarregada.', 'error');
+        setTimeout(() => location.reload(), 3000); // Recarrega após 3 segundos
     }
 }
 
@@ -464,14 +478,14 @@ async function deleteLead(leadId) {
         const data = await response.json();
         if (response.ok) {
             loadLeads(); // Recarrega a lista de leads
-            alert('Lead excluído com sucesso!');
+            showNotification('Lead excluído com sucesso!', 'success');
         } else {
             console.error('Erro ao excluir lead:', data.error);
-            alert('Erro ao excluir lead. Por favor, tente novamente.');
+            showNotification('Erro ao excluir lead. Por favor, tente novamente.', 'error');
         }
     } catch (error) {
         console.error('Erro ao excluir lead:', error);
-        alert('Erro ao excluir lead. Por favor, tente novamente.');
+        showNotification('Erro ao excluir lead. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -502,43 +516,51 @@ function showStageActions(leadId) {
     const stageActions = {
         novo: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
-            { name: 'Editar', action: () => showEditLeadForm(leadId) }
+            { name: 'Editar', action: () => showEditLeadForm(leadId) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         visita: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Agendar visita', action: () => scheduleVisit(lead) },
-            { name: 'Preparar material de apresentação', action: () => preparePresentationMaterial(lead) }
+            { name: 'Preparar material de apresentação', action: () => preparePresentationMaterial(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         negociacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Enviar proposta', action: () => sendProposal(lead) }
+            { name: 'Enviar proposta', action: () => sendProposal(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         qualificacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como qualificado', action: () => markAsQualified(lead) }
+            { name: 'Marcar como qualificado', action: () => markAsQualified(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         apresentacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como apresentado', action: () => markAsPresented(lead) }
+            { name: 'Marcar como apresentado', action: () => markAsPresented(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         contrato: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como contrato assinado', action: () => markAsContractSigned(lead) }
+            { name: 'Marcar como contrato assinado', action: () => markAsContractSigned(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         concluido: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como concluído', action: () => markAsCompleted(lead) }
+            { name: 'Marcar como concluído', action: () => markAsCompleted(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ],
         posvenda: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) }
+            { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) },
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
         ]
     };
 
@@ -582,13 +604,13 @@ function showActionsModal(actions, lead) {
 // Funções para cada ação específica
 function scheduleCall(lead) {
     console.log(`Agendando chamada para ${lead.name}`);
-    alert(`Chamada agendada para ${lead.name}`);
+    showNotification(`Chamada agendada para ${lead.name}`, 'success');
     // Implemente a lógica para agendar uma chamada
 }
 
 function sendWelcomeEmail(lead) {
     console.log(`Enviando e-mail de boas-vindas para ${lead.email}`);
-    alert(`E-mail de boas-vindas enviado para ${lead.email}`);
+    showNotification(`E-mail de boas-vindas enviado para ${lead.email}`, 'success');
     // Implemente a lógica para enviar e-mail de boas-vindas
 }
 
@@ -677,10 +699,10 @@ async function handleEditFormSubmit(event) {
         }
         displayLeadsInFunnel(allLeads);
         closeEditLeadForm();
-        alert('Lead atualizado com sucesso!');
+        showNotification('Lead atualizado com sucesso!', 'success');
     } catch (error) {
         console.error('Erro ao atualizar lead:', error);
-        alert('Erro ao atualizar lead. Por favor, tente novamente.');
+        showNotification('Erro ao atualizar lead. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -699,3 +721,161 @@ function closeModal(modalId) {
 window.showStageActions = showStageActions;
 window.showLeadDetails = showLeadDetails;
 window.closeForm = closeForm;
+
+function openPropertySearchModal(leadId) {
+    const modal = document.getElementById('property-search-modal');
+    modal.style.display = 'block';
+    
+    const searchInput = document.getElementById('property-search-input');
+    searchInput.value = '';
+    searchInput.focus();
+    
+    document.getElementById('property-search-results').innerHTML = '';
+    
+    // Armazenar o ID do lead atual para uso posterior
+    currentLeadId = leadId;
+}
+
+let currentLeadId = null;
+
+// Adicione esta função para fechar a modal
+function closePropertySearchModal() {
+    document.getElementById('property-search-modal').style.display = 'none';
+}
+
+// Adicione event listeners para a pesquisa de imóveis
+document.getElementById('property-search-input').addEventListener('input', debounce(searchProperties, 300));
+
+async function searchProperties(event) {
+    console.log('Termo de busca recebido:', event.target.value);
+    const searchTerm = event.target.value;
+    if (searchTerm.length < 3) return;
+    
+    try {
+        console.log('URL da busca:', `${API_BASE_URL}/api/properties/search?term=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`${API_BASE_URL}/api/properties/search?term=${encodeURIComponent(searchTerm)}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Falha ao buscar propriedades');
+        }
+        
+        const data = await response.json();
+        console.log('Dados recebidos:', data);
+        displaySearchResults(data.data);
+    } catch (error) {
+        console.error('Erro ao buscar propriedades:', error);
+    }
+}
+
+function formatPrice(price) {
+    if (typeof price === 'number') {
+        return 'R$ ' + price.toLocaleString('pt-BR');
+    } else if (typeof price === 'string' && !isNaN(parseFloat(price))) {
+        return 'R$ ' + parseFloat(price).toLocaleString('pt-BR');
+    } else {
+        return 'Preço não informado';
+    }
+}
+
+function displaySearchResults(properties) {
+    const resultsContainer = document.getElementById('property-search-results');
+    resultsContainer.innerHTML = '';
+    
+    properties.forEach(property => {
+        const propertyElement = document.createElement('div');
+        propertyElement.className = 'property-item';
+        propertyElement.textContent = `${property.title || 'Sem título'} - ${formatPrice(property.salePrice)}`;
+        propertyElement.onclick = () => selectProperty(property);
+        resultsContainer.appendChild(propertyElement);
+    });
+}
+
+async function selectProperty(property) {
+    try {
+        console.log('Iniciando vinculação de propriedade:', property);
+        const response = await fetch(`${API_BASE_URL}/api/leads/${currentLeadId}/link-property`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ propertyId: property._id })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Falha ao vincular imóvel');
+        }
+        
+        const updatedLead = await response.json();
+        console.log('Lead atualizado:', updatedLead);
+        updateLeadUI(updatedLead.data);
+        closePropertySearchModal();
+
+        console.log('Chamando showNotification');
+        showNotification('Imóvel vinculado com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao vincular imóvel:', error);
+        showNotification('Erro ao vincular imóvel. Tente novamente.', 'error');
+    }
+}
+
+function updateLeadUI(lead) {
+    const leadElement = document.getElementById(`lead-${lead._id}`);
+    if (leadElement) {
+        const linkedPropertyInfo = lead.linkedProperty ? 
+            `<div class="linked-property">
+                <strong>Imóvel vinculado:</strong> ${lead.linkedProperty.title || 'Sem título'}
+                <br>Endereço: ${lead.linkedProperty.address || 'Não informado'}
+                <br>Preço: R$ ${lead.linkedProperty.price ? lead.linkedProperty.price.toLocaleString('pt-BR') : 'Não informado'}
+            </div>` : 
+            '<div class="no-property">Nenhum imóvel vinculado</div>';
+
+        const propertyInfoElement = leadElement.querySelector('.linked-property') || leadElement.querySelector('.no-property');
+        if (propertyInfoElement) {
+            propertyInfoElement.outerHTML = linkedPropertyInfo;
+        } else {
+            leadElement.insertAdjacentHTML('beforeend', linkedPropertyInfo);
+        }
+    }
+}
+
+function displayLeads(leads) {
+    const columns = document.querySelectorAll('.column');
+    columns.forEach(column => column.innerHTML = '');
+
+    leads.forEach(lead => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `lead-${lead._id}`;
+
+        const linkedPropertyInfo = lead.linkedProperty ? 
+            `<div class="linked-property">
+                <strong>Imóvel vinculado:</strong> ${lead.linkedProperty.title || 'Sem título'}
+                <br>Endereço: ${lead.linkedProperty.address || 'Não informado'}
+                <br>Preço: R$ ${lead.linkedProperty.price ? lead.linkedProperty.price.toLocaleString('pt-BR') : 'Não informado'}
+            </div>` : 
+            '<div class="no-property">Nenhum imóvel vinculado</div>';
+
+        card.innerHTML = `
+            <h3>${lead.name}</h3>
+            <p>Email: ${lead.email}</p>
+            <p>Telefone: ${lead.phone}</p>
+            ${linkedPropertyInfo}
+            <button onclick="showLeadActions('${lead._id}')">Ações</button>
+        `;
+
+        const column = document.querySelector(`.${lead.stage}`);
+        column.appendChild(card);
+    });
+}
+
+
+
+
+
+

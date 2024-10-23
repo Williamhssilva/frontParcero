@@ -1,6 +1,6 @@
 import { API_BASE_URL } from './config.js';
 import { getCurrentUser, checkPermission } from './auth.js';
-import { renderMenu } from './menu.js';
+import { renderMenu, showNotification } from './menu.js';
 import { authenticatedFetch } from './utils.js';
 
 let currentPage = 1;
@@ -515,23 +515,6 @@ function checkUrlParams() {
     } else if (res === '0') {
         showNotification('Erro ao adicionar propriedade. Por favor, tente novamente.', 'error');
     }
-}
-
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.classList.add('show');
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }, 100);
 }
 
 function initializeModalCarousel() {

@@ -81,3 +81,27 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+
+export function showNotification(message, type = 'info') {
+    console.log('Mostrando notificação:', message, type);
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    console.log('Elemento de notificação criado:', notification);
+
+    // Forçar um reflow para garantir que a animação seja aplicada
+    notification.offsetHeight;
+
+    // Adicionar classe para fade in
+    notification.classList.add('show');
+
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+            console.log('Notificação removida');
+        }, 300); // Tempo para a animação de fade out
+    }, 3000);
+}

@@ -1,8 +1,6 @@
 import { API_BASE_URL } from './config.js';
 import { renderMenu } from './menu.js';
 
-// Remova ou comente esta linha, pois estamos importando API_BASE_URL acima
-// const API_BASE_URL = 'http://localhost:5000';
 
 import { getCurrentUser, checkPermission } from './auth.js';
 
@@ -139,7 +137,15 @@ function setupEventListeners() {
 
 async function loadLeads() {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/leads`, {
+        const currentUser = getCurrentUser(); // Obtém o usuário atual
+        let url = `${API_BASE_URL}/api/leads`; // URL base para a requisição
+
+        // Se o usuário for um corretor, adicione um parâmetro para filtrar os leads
+        if (currentUser.role === 'corretor') {
+            url += `?agent=${currentUser.id}`; // Filtra leads pelo ID do corretor
+        }
+
+        const response = await fetch(url, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -148,8 +154,8 @@ async function loadLeads() {
         const data = await response.json();
 
         if (response.ok) {
-            allLeads = data.data;
-            displayLeadsInFunnel(allLeads);
+            allLeads = data.data; // Armazena os leads recebidos
+            displayLeadsInFunnel(allLeads); // Exibe os leads na interface
         } else {
             console.error('Erro ao carregar leads:', data.error);
         }

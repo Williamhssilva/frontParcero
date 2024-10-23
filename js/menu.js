@@ -26,7 +26,7 @@ export function renderMenu() {
         }
 
         if (user.role === 'administrador') {
-           menuItems.push(createMenuItem('admin-dashboard.html', 'fas fa-user-shield', 'Admin'));
+           menuItems.push(createMenuItem('admin-dashboard.html', 'fas fa-user-shield', 'Dashboard'));
         }
 
         if (user.role === 'cliente') {

@@ -379,3 +379,23 @@
     opacity: 1;
     visibility: visible;
 }
+
+.linked-property-container {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.unlink-property-btn {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 0.8em;
+    margin-left: 5px;
+    padding: 0;
+}
+
+.unlink-property-btn:hover {
+    color: #ff0000;
+}

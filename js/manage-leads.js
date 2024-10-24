@@ -232,16 +232,23 @@ function createLeadCard(lead) {
     card.id = `lead-${lead._id}`;
     card.setAttribute('data-id', lead._id);
 
-    let linkedPropertyIcon = '';
+    let linkedPropertyHtml = '';
     if (lead.linkedProperty) {
-        linkedPropertyIcon = `<i class="fas fa-home linked-property-icon" 
-            data-tooltip="Carregando..."
-            data-property-id="${lead.linkedProperty}"></i>`;
+        linkedPropertyHtml = `
+            <div class="linked-property-container">
+                <i class="fas fa-home linked-property-icon" 
+                   data-property-id="${lead.linkedProperty}" 
+                   data-tooltip="Carregando..."></i>
+                <button class="unlink-property-btn" data-tooltip="Desvincular imóvel">
+                    <i class="fas fa-unlink"></i>
+                </button>
+            </div>
+        `;
     }
 
     card.innerHTML = `
         <div class="lead-card-header">
-            <h3 class="lead-name">${lead.name} ${linkedPropertyIcon}</h3>
+            <h3 class="lead-name">${lead.name} ${linkedPropertyHtml}</h3>
         </div>
         <div class="lead-card-body">
             <p class="lead-email"><i class="fas fa-envelope"></i> ${lead.email}</p>
@@ -253,16 +260,24 @@ function createLeadCard(lead) {
         </div>
     `;
 
-    // Adicionar event listener para o ícone de imóvel vinculado
-    const icon = card.querySelector('.linked-property-icon');
-    if (icon) {
+    // Adicionar event listeners
+    if (lead.linkedProperty) {
+        const icon = card.querySelector('.linked-property-icon');
+        const unlinkButton = card.querySelector('.unlink-property-btn');
+
         icon.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que o evento se propague para o card
-            const propertyId = e.target.getAttribute('data-property-id');
-            window.location.href = `property-details.html?id=${propertyId}`;
+            e.stopPropagation();
+            window.location.href = `property-details.html?id=${lead.linkedProperty}`;
         });
 
-        // Buscar e atualizar os detalhes da propriedade
+        unlinkButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('Tem certeza que deseja desvincular este imóvel?')) {
+                unlinkProperty(lead._id);
+            }
+        });
+
+        // Buscar detalhes da propriedade
         fetchPropertyDetails(lead.linkedProperty)
             .then(propertyDetails => {
                 if (propertyDetails) {
@@ -826,46 +841,65 @@ function updateLeadUI(lead) {
     if (leadElement) {
         const headerElement = leadElement.querySelector('.lead-card-header');
         if (headerElement) {
-            // Remover o ícone existente, se houver
-            const existingIcon = headerElement.querySelector('.linked-property-icon');
-            if (existingIcon) {
-                existingIcon.remove();
+            // Atualizar o nome do lead
+            const nameElement = headerElement.querySelector('.lead-name');
+            nameElement.textContent = lead.name;
+
+            // Remover o container de propriedade existente, se houver
+            const existingContainer = headerElement.querySelector('.linked-property-container');
+            if (existingContainer) {
+                existingContainer.remove();
             }
 
-            // Adicionar o novo ícone, se necessário
+            // Adicionar o novo container de propriedade, se necessário
             if (lead.linkedProperty) {
-                const linkedPropertyIcon = document.createElement('i');
-                linkedPropertyIcon.className = 'fas fa-home linked-property-icon';
-                linkedPropertyIcon.setAttribute('data-property-id', lead.linkedProperty);
-                
-                if (lead.linkedPropertyDetails) {
-                    const tooltipText = `${lead.linkedPropertyDetails.title || 'Sem título'} - ${formatPrice(lead.linkedPropertyDetails.salePrice)}`;
-                    linkedPropertyIcon.setAttribute('data-tooltip', tooltipText);
-                } else {
-                    linkedPropertyIcon.setAttribute('data-tooltip', 'Carregando...');
-                    // Buscar detalhes da propriedade se não estiverem disponíveis
-                    fetchPropertyDetails(lead.linkedProperty)
-                        .then(propertyDetails => {
-                            if (propertyDetails) {
-                                lead.linkedPropertyDetails = propertyDetails;
-                                const tooltipText = `${propertyDetails.title || 'Sem título'} - ${formatPrice(propertyDetails.salePrice)}`;
-                                linkedPropertyIcon.setAttribute('data-tooltip', tooltipText);
-                            } else {
-                                linkedPropertyIcon.setAttribute('data-tooltip', 'Detalhes não disponíveis');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erro ao buscar detalhes da propriedade:', error);
-                            linkedPropertyIcon.setAttribute('data-tooltip', 'Erro ao carregar detalhes');
-                        });
-                }
+                const propertyContainer = document.createElement('div');
+                propertyContainer.className = 'linked-property-container';
+                propertyContainer.innerHTML = `
+                    <i class="fas fa-home linked-property-icon" 
+                       data-property-id="${lead.linkedProperty}" 
+                       data-tooltip="Carregando..."></i>
+                    <button class="unlink-property-btn" data-tooltip="Desvincular imóvel">
+                        <i class="fas fa-unlink"></i>
+                    </button>
+                `;
+                nameElement.appendChild(propertyContainer);
 
-                linkedPropertyIcon.addEventListener('click', (e) => {
+                const icon = propertyContainer.querySelector('.linked-property-icon');
+                const unlinkButton = propertyContainer.querySelector('.unlink-property-btn');
+
+                icon.addEventListener('click', (e) => {
                     e.stopPropagation();
                     window.location.href = `property-details.html?id=${lead.linkedProperty}`;
                 });
-                headerElement.querySelector('.lead-name').appendChild(linkedPropertyIcon);
+
+                unlinkButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('Tem certeza que deseja desvincular este imóvel?')) {
+                        unlinkProperty(lead._id);
+                    }
+                });
+
+                // Buscar detalhes da propriedade
+                fetchPropertyDetails(lead.linkedProperty)
+                    .then(propertyDetails => {
+                        if (propertyDetails) {
+                            const tooltipText = `${propertyDetails.title || 'Sem título'} - ${formatPrice(propertyDetails.salePrice)}`;
+                            icon.setAttribute('data-tooltip', tooltipText);
+                        } else {
+                            icon.setAttribute('data-tooltip', 'Detalhes não disponíveis');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar detalhes da propriedade:', error);
+                        icon.setAttribute('data-tooltip', 'Erro ao carregar detalhes');
+                    });
             }
+
+            // Atualizar outros detalhes do lead...
+            leadElement.querySelector('.lead-email').textContent = lead.email;
+            leadElement.querySelector('.lead-phone').textContent = lead.phone;
+            leadElement.querySelector('.lead-interest').textContent = lead.interest;
         }
     }
 }
@@ -901,5 +935,36 @@ async function updateLeadsWithPropertyDetails(leads) {
             })
     );
     return Promise.all(propertyPromises);
+}
+
+async function unlinkProperty(leadId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}/unlink-property`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Falha ao desvincular imóvel');
+        }
+
+        const updatedLead = await response.json();
+        console.log('Lead atualizado:', updatedLead);
+
+        // Atualizar o lead na lista allLeads
+        const index = allLeads.findIndex(l => l._id === updatedLead.data._id);
+        if (index !== -1) {
+            allLeads[index] = updatedLead.data;
+        }
+
+        updateLeadUI(updatedLead.data);
+        showNotification('Imóvel desvinculado com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao desvincular imóvel:', error);
+        showNotification('Erro ao desvincular imóvel. Tente novamente.', 'error');
+    }
 }
 

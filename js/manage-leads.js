@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setupEventListeners();
         loadLeads();
         initializeSortable();
-        initializeDraggableScroll(); // Adicione esta linha
+        initializeDraggableScroll(); 
     }
 });
 
@@ -162,17 +162,21 @@ async function loadLeads() {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-
+        if (!response.ok) {
+            throw new Error('Falha ao carregar leads');
+        }
         const data = await response.json();
 
         if (response.ok) {
             allLeads = data.data;
+            await updateLeadsWithPropertyDetails(allLeads);
             displayLeadsInFunnel(allLeads);
         } else {
             console.error('Erro ao carregar leads:', data.error);
         }
     } catch (error) {
         console.error('Erro ao carregar leads:', error);
+        showNotification('Erro ao carregar leads. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -225,49 +229,54 @@ function displayLeadsInFunnel(leads) {
 function createLeadCard(lead) {
     const card = document.createElement('div');
     card.className = 'lead-card';
+    card.id = `lead-${lead._id}`;
     card.setAttribute('data-id', lead._id);
+
+    let linkedPropertyIcon = '';
+    if (lead.linkedProperty) {
+        linkedPropertyIcon = `<i class="fas fa-home linked-property-icon" 
+            data-tooltip="Carregando..."
+            data-property-id="${lead.linkedProperty}"></i>`;
+    }
+
     card.innerHTML = `
         <div class="lead-card-header">
-            <h4 class="lead-name">${lead.name}</h4>
-            <span class="lead-stage">${lead.stage}</span>
+            <h3 class="lead-name">${lead.name} ${linkedPropertyIcon}</h3>
         </div>
         <div class="lead-card-body">
-            <a href="tel:${lead.phone}" class="lead-phone">
-                <i class="fas fa-phone"></i> ${lead.phone}
-            </a>
-            <p class="lead-email">
-                <i class="fas fa-envelope"></i> ${lead.email}
-            </p>
-            <p class="lead-interest">
-                <i class="fas fa-home"></i> ${lead.interest}
-            </p>
-            ${getCurrentUser().role === 'administrador' ? `<p class="lead-captured-by"><i class="fas fa-user"></i> Cadastrado por: ${lead.capturedByName}</p>` : ''}
+            <p class="lead-email"><i class="fas fa-envelope"></i> ${lead.email}</p>
+            <p class="lead-phone"><i class="fas fa-phone"></i> ${lead.phone}</p>
+            <p class="lead-interest"><i class="fas fa-info-circle"></i> ${lead.interest}</p>
         </div>
         <div class="lead-card-footer">
-            <button class="btn btn-actions">Ações</button>
+            <button class="btn-actions" onclick="showStageActions('${lead._id}')">Ações</button>
         </div>
     `;
 
-    const actionButton = card.querySelector('.btn-actions');
-    actionButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede que o evento de clique se propague para o card
-        showStageActions(lead._id);
-    });
-    card.addEventListener('click', () => {
-        currentLead = lead; // Define o lead atual quando o card é clicado
-        showLeadDetails(lead);
-    });
+    // Adicionar event listener para o ícone de imóvel vinculado
+    const icon = card.querySelector('.linked-property-icon');
+    if (icon) {
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita que o evento se propague para o card
+            const propertyId = e.target.getAttribute('data-property-id');
+            window.location.href = `property-details.html?id=${propertyId}`;
+        });
 
-    // Adiciona evento de clique ao número de telefone
-    const phoneElement = card.querySelector('.lead-phone');
-    phoneElement.addEventListener('click', (e) => {
-        e.stopPropagation(); // Impede que o evento de clique se propague para o card
-        currentLead = lead; // Atualiza o lead atual
-        const currentUser = getCurrentUser();
-        const corretorName = currentUser ? currentUser.name : "Corretor"; // Usa o nome do usuário atual ou "Corretor" como fallback
-        const message = generateWhatsAppMessage(lead.name, corretorName);
-        sendWhatsAppMessage(lead.phone, message);
-    });
+        // Buscar e atualizar os detalhes da propriedade
+        fetchPropertyDetails(lead.linkedProperty)
+            .then(propertyDetails => {
+                if (propertyDetails) {
+                    const tooltipText = `${propertyDetails.title || 'Sem título'} - ${formatPrice(propertyDetails.salePrice)}`;
+                    icon.setAttribute('data-tooltip', tooltipText);
+                } else {
+                    icon.setAttribute('data-tooltip', 'Detalhes não disponíveis');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar detalhes da propriedade:', error);
+                icon.setAttribute('data-tooltip', 'Erro ao carregar detalhes');
+            });
+    }
 
     return card;
 }
@@ -353,33 +362,13 @@ async function handleFormSubmit(event) {
         displayLeadsInFunnel(allLeads);
         closeAddLeadForm();
         showNotification('Lead adicionado com sucesso!', 'success');
+
+        // Limpar os campos do formulário
+        form.reset();
+
     } catch (error) {
         console.error('Erro ao adicionar lead:', error);
         showNotification('Erro ao adicionar lead. Por favor, tente novamente.', 'error');
-    }
-}
-
-async function updateLeadStatus(leadId, newStatus) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ status: newStatus })
-        });
-
-        if (!response.ok) {
-            throw new Error('Falha ao atualizar status do lead');
-        }
-
-        // Recarregar leads após atualização bem-sucedida
-        loadLeads();
-        showNotification(`Status do lead atualizado para ${newStatus}`, 'success');
-    } catch (error) {
-        console.error('Erro ao atualizar status do lead:', error);
-        showNotification('Erro ao atualizar status do lead. Por favor, tente novamente.', 'error');
     }
 }
 
@@ -813,6 +802,14 @@ async function selectProperty(property) {
         
         const updatedLead = await response.json();
         console.log('Lead atualizado:', updatedLead);
+
+        // Atualizar o lead na lista allLeads
+        const index = allLeads.findIndex(l => l._id === updatedLead.data._id);
+        if (index !== -1) {
+            allLeads[index] = updatedLead.data;
+            allLeads[index].linkedPropertyDetails = property;
+        }
+
         updateLeadUI(updatedLead.data);
         closePropertySearchModal();
 
@@ -827,55 +824,82 @@ async function selectProperty(property) {
 function updateLeadUI(lead) {
     const leadElement = document.getElementById(`lead-${lead._id}`);
     if (leadElement) {
-        const linkedPropertyInfo = lead.linkedProperty ? 
-            `<div class="linked-property">
-                <strong>Imóvel vinculado:</strong> ${lead.linkedProperty.title || 'Sem título'}
-                <br>Endereço: ${lead.linkedProperty.address || 'Não informado'}
-                <br>Preço: R$ ${lead.linkedProperty.price ? lead.linkedProperty.price.toLocaleString('pt-BR') : 'Não informado'}
-            </div>` : 
-            '<div class="no-property">Nenhum imóvel vinculado</div>';
+        const headerElement = leadElement.querySelector('.lead-card-header');
+        if (headerElement) {
+            // Remover o ícone existente, se houver
+            const existingIcon = headerElement.querySelector('.linked-property-icon');
+            if (existingIcon) {
+                existingIcon.remove();
+            }
 
-        const propertyInfoElement = leadElement.querySelector('.linked-property') || leadElement.querySelector('.no-property');
-        if (propertyInfoElement) {
-            propertyInfoElement.outerHTML = linkedPropertyInfo;
-        } else {
-            leadElement.insertAdjacentHTML('beforeend', linkedPropertyInfo);
+            // Adicionar o novo ícone, se necessário
+            if (lead.linkedProperty) {
+                const linkedPropertyIcon = document.createElement('i');
+                linkedPropertyIcon.className = 'fas fa-home linked-property-icon';
+                linkedPropertyIcon.setAttribute('data-property-id', lead.linkedProperty);
+                
+                if (lead.linkedPropertyDetails) {
+                    const tooltipText = `${lead.linkedPropertyDetails.title || 'Sem título'} - ${formatPrice(lead.linkedPropertyDetails.salePrice)}`;
+                    linkedPropertyIcon.setAttribute('data-tooltip', tooltipText);
+                } else {
+                    linkedPropertyIcon.setAttribute('data-tooltip', 'Carregando...');
+                    // Buscar detalhes da propriedade se não estiverem disponíveis
+                    fetchPropertyDetails(lead.linkedProperty)
+                        .then(propertyDetails => {
+                            if (propertyDetails) {
+                                lead.linkedPropertyDetails = propertyDetails;
+                                const tooltipText = `${propertyDetails.title || 'Sem título'} - ${formatPrice(propertyDetails.salePrice)}`;
+                                linkedPropertyIcon.setAttribute('data-tooltip', tooltipText);
+                            } else {
+                                linkedPropertyIcon.setAttribute('data-tooltip', 'Detalhes não disponíveis');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao buscar detalhes da propriedade:', error);
+                            linkedPropertyIcon.setAttribute('data-tooltip', 'Erro ao carregar detalhes');
+                        });
+                }
+
+                linkedPropertyIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.location.href = `property-details.html?id=${lead.linkedProperty}`;
+                });
+                headerElement.querySelector('.lead-name').appendChild(linkedPropertyIcon);
+            }
         }
     }
 }
 
-function displayLeads(leads) {
-    const columns = document.querySelectorAll('.column');
-    columns.forEach(column => column.innerHTML = '');
-
-    leads.forEach(lead => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.id = `lead-${lead._id}`;
-
-        const linkedPropertyInfo = lead.linkedProperty ? 
-            `<div class="linked-property">
-                <strong>Imóvel vinculado:</strong> ${lead.linkedProperty.title || 'Sem título'}
-                <br>Endereço: ${lead.linkedProperty.address || 'Não informado'}
-                <br>Preço: R$ ${lead.linkedProperty.price ? lead.linkedProperty.price.toLocaleString('pt-BR') : 'Não informado'}
-            </div>` : 
-            '<div class="no-property">Nenhum imóvel vinculado</div>';
-
-        card.innerHTML = `
-            <h3>${lead.name}</h3>
-            <p>Email: ${lead.email}</p>
-            <p>Telefone: ${lead.phone}</p>
-            ${linkedPropertyInfo}
-            <button onclick="showLeadActions('${lead._id}')">Ações</button>
-        `;
-
-        const column = document.querySelector(`.${lead.stage}`);
-        column.appendChild(card);
+function fetchPropertyDetails(propertyId) {
+    return fetch(`${API_BASE_URL}/api/properties/${propertyId}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Falha ao buscar detalhes do imóvel');
+        }
+        return response.json();
+    })
+    .then(data => data.data.property)
+    .catch(error => {
+        console.error('Erro ao buscar detalhes do imóvel:', error);
+        return null;
     });
 }
 
-
-
-
-
+async function updateLeadsWithPropertyDetails(leads) {
+    const leadsWithProperties = leads.filter(lead => lead.linkedProperty);
+    const propertyPromises = leadsWithProperties.map(lead => 
+        fetchPropertyDetails(lead.linkedProperty)
+            .then(propertyDetails => {
+                if (propertyDetails) {
+                    lead.linkedPropertyDetails = propertyDetails;
+                }
+                return lead;
+            })
+    );
+    return Promise.all(propertyPromises);
+}
 

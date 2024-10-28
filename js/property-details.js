@@ -87,7 +87,7 @@ function displayPropertyDetails(property) {
     `;
 
     // Atualizar descrição
-    document.getElementById('property-description-text').textContent = property.property.description || 'Descrição não disponível';
+    document.getElementById('property-description-text').innerHTML = property.property.description || 'Descrição não disponível';
 
     // Atualizar detalhes
     const detailsContainer = document.getElementById('property-details-list');

@@ -3,6 +3,7 @@ import { getCurrentUser, checkPermission } from './auth.js';
 import { renderMenu } from './menu.js';
 
 let currentProperty = null;
+let editor = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     checkPermission(['corretor', 'administrador']);
@@ -246,6 +247,35 @@ function populateForm(property) {
         <button type="submit" class="submit-btn">Salvar Alterações</button>
     `;
 
+    // Inicializar o CKEditor
+    ClassicEditor
+        .create(document.querySelector('#description'), {
+            toolbar: [
+                'heading',
+                '|',
+                'bold',
+                'italic',
+                'link',
+                'bulletedList',
+                'numberedList',
+                '|',
+                'outdent',
+                'indent',
+                '|',
+                'blockQuote',
+                'undo',
+                'redo'
+            ],
+            language: 'pt-br',
+            placeholder: 'Descreva a propriedade em detalhes...'
+        })
+        .then(newEditor => {
+            editor = newEditor;
+        })
+        .catch(error => {
+            console.error('Erro ao inicializar o editor:', error);
+        });
+
     // Adicione o event listener para o select após a criação do elemento
     const propertyTypeSelect = document.getElementById('propertyType');
     propertyTypeSelect.addEventListener('change', toggleApartmentFields);
@@ -363,6 +393,14 @@ async function handleSubmit(event) {
 
     const form = event.target;
     const formData = new FormData(form);
+
+    // Pegar o conteúdo do editor
+    const description = editor.getData().trim();
+    if (!description) {
+        showNotification('A descrição é obrigatória', 'error');
+        return;
+    }
+    formData.set('description', description);
 
     // Capturar a ordem atual das imagens
     const currentImages = Array.from(document.querySelectorAll('.image-preview-item'))

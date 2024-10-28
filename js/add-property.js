@@ -4,6 +4,8 @@ import { renderMenu } from './menu.js';
 
 console.log('add-property.js carregado');
 
+let editor; // Declarar variável global para o editor
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded event fired');
     checkPermission(['corretor']);
@@ -11,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImagePreview();
     renderMenu();
     toggleApartmentFields();
+    initEditor(); // Adicionar inicialização do editor
 
     // Adiciona o listener para o select
     const propertyTypeSelect = document.getElementById('propertyType');
@@ -129,6 +132,10 @@ async function handleSubmit(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
+
+    // Adicionar o conteúdo do editor ao FormData
+    const description = editor.getData();
+    formData.set('description', description);
 
     // Capturar a ordem atual das imagens
     const imageContainers = Array.from(document.querySelectorAll('.image-preview-item'));
@@ -292,4 +299,16 @@ function showNotification(message, type = 'info') {
 
     // Adicione este console.log para garantir que a mensagem seja exibida no console
     console.log(`Notificação: ${type} - ${message}`);
+}
+
+// Adicionar esta nova função
+function initEditor() {
+    ClassicEditor
+        .create(document.querySelector('#description'))
+        .then(newEditor => {
+            editor = newEditor;
+        })
+        .catch(error => {
+            console.error('Erro ao inicializar o editor:', error);
+        });
 }

@@ -603,6 +603,13 @@ function showActionsModal(actions, lead) {
     // Adiciona event listener para o botão de fechar
     const closeButton = modal.querySelector('.close-modal');
     closeButton.addEventListener('click', () => modal.remove());
+
+    // Adiciona event listener para fechar ao clicar fora da modal
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.remove();
+        }
+    });
 }
 
 // Funções para cada ação específica

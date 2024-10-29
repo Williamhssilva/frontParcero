@@ -174,7 +174,7 @@ async function handleSubmit(event) {
         
         showNotification('Propriedade adicionada com sucesso!', 'success');
         setTimeout(() => {
-            window.location.href = 'properties.html';
+            window.location.href = 'manage-properties.html';
         }, 2000);
 
     } catch (error) {

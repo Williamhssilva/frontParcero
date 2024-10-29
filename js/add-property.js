@@ -50,154 +50,112 @@ function setupForm() {
 }
 
 function setupImagePreview() {
-    const input = document.getElementById('images');
-    const preview = document.getElementById('image-preview');
-
-    if (!preview) {
-        console.error('Elemento image-preview não encontrado');
-        return;
-    }
-
-    input.addEventListener('change', () => {
-        for (const file of input.files) {
+    const imageInput = document.getElementById('images');
+    const previewContainer = document.getElementById('image-preview');
+    
+    imageInput.addEventListener('change', function(e) {
+        previewContainer.innerHTML = '';
+        const files = Array.from(e.target.files);
+        
+        files.forEach((file, index) => {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const imgContainer = document.createElement('div');
-                imgContainer.className = 'image-preview-item';
-                imgContainer.setAttribute('data-src', e.target.result);
-                const originalIndex = preview.children.length;
-                imgContainer.setAttribute('data-original-index', originalIndex);
-                imgContainer.setAttribute('data-index', originalIndex);
-
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.alt = file.name;
-
-                const removeButton = document.createElement('button');
-                removeButton.type = 'button';
-                removeButton.className = 'remove-image';
-                removeButton.textContent = 'X';
-                removeButton.onclick = () => removeImage(imgContainer);
-
-                const positionLabel = document.createElement('span');
-                positionLabel.className = 'image-position';
-                positionLabel.textContent = originalIndex + 1;
-
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(removeButton);
-                imgContainer.appendChild(positionLabel);
-                preview.appendChild(imgContainer);
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-preview-item';
+            previewItem.setAttribute('data-index', index);
+            previewItem.setAttribute('data-original-index', index);
+            
+            reader.onload = function(e) {
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <span class="image-position">${index + 1}</span>
+                    <button type="button" class="remove-image">&times;</button>
+                `;
+                
+                const removeButton = previewItem.querySelector('.remove-image');
+                removeButton.addEventListener('click', () => {
+                    previewItem.remove();
+                    updateImageOrder();
+                });
             };
+            
             reader.readAsDataURL(file);
+            previewContainer.appendChild(previewItem);
+        });
+
+        // Inicializar Sortable
+        if (!previewContainer.sortable) {
+            previewContainer.sortable = new Sortable(previewContainer, {
+                animation: 150,
+                onEnd: updateImageOrder
+            });
         }
     });
-
-    // Inicializar Sortable
-    new Sortable(preview, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        dragClass: 'sortable-drag',
-        handle: '.image-preview-item', // Isso permite arrastar pelo item inteiro
-        onEnd: function () {
-            updateImageOrder();
-        }
-    });
-}
-
-function removeImage(imgContainer) {
-    imgContainer.remove();
-    updateImageOrder();
 }
 
 function updateImageOrder() {
     const imageContainers = document.querySelectorAll('.image-preview-item');
-    const updatedOrder = [];
-    console.log(updatedOrder);
+    
+    // Atualizar os números de posição
     imageContainers.forEach((container, index) => {
-
-        container.setAttribute('data-index', index); // Atualiza o índice
-
-        // Adiciona ao array de ordem atualizada
-        updatedOrder.push({
-            originalIndex: container.getAttribute('data-original-index'),
-            newIndex: index,
-        });
+        container.setAttribute('data-index', index);
+        const positionSpan = container.querySelector('.image-position');
+        if (positionSpan) {
+            positionSpan.textContent = index + 1;
+        }
     });
-
-    // Log da nova ordem com nomes das imagens
-    console.log('Nova ordem das imagens:', updatedOrder);
 }
 
 async function handleSubmit(event) {
     event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    // Adicionar o conteúdo do editor ao FormData
-    const description = editor.getData();
-    formData.set('description', description);
-
-    // Capturar a ordem atual das imagens
-    const imageContainers = Array.from(document.querySelectorAll('.image-preview-item'));
-    const currentImages = imageContainers.map((container, currentIndex) => ({
-        src: container.getAttribute('data-src'),
-        currentIndex: currentIndex,
-        originalIndex: parseInt(container.getAttribute('data-original-index'))
-    }));
-
-    // Adicionar a nova ordem das imagens como um campo separado
-    const newOrder = currentImages.map(img => img.originalIndex);
-    formData.append('imageOrder', JSON.stringify(newOrder));
-
-    // Converter data URLs para arquivos e adicionar ao FormData
-    formData.delete('images');
-    const imagePromises = currentImages.map(async (img, index) => {
-        const response = await fetch(img.src);
-        const blob = await response.blob();
-        const file = new File([blob], `image_${index}.jpg`, { type: 'image/jpeg' });
-        formData.append('images', file);
-        console.log(`Adicionando ao FormData: Imagem ${index + 1} (originalmente na posição ${img.originalIndex + 1})`);
-    });
-
-    await Promise.all(imagePromises);
-
-    // Remove campos vazios ou converte para null
-    for (let [key, value] of formData.entries()) {
-        if (value === '') {
-            formData.delete(key);
-        }
-    }
-
-    // Adicionar campos booleanos explicitamente
-    const booleanFields = ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator', 'hasPromotion'];
-    booleanFields.forEach(field => {
-        formData.set(field, form.querySelector(`#${field}`).checked.toString());
-    });
-
-    // Adicionar o ID do corretor atual
-    formData.append('capturedBy', getCurrentUser().id);
-    formData.append('capturedByName', getCurrentUser().name);
-    // Converter checkbox para booleano
-    formData.set('isCondominium', form.isCondominium.checked);
-    formData.set('hasBackyard', form.hasBackyard.checked);
-    formData.set('hasBalcony', form.hasBalcony.checked);
-    formData.set('hasElevator', form.hasElevator.checked);
-    formData.set('hasPromotion', form.hasPromotion.checked);
-    console.log('FormData111111111:', formData);
-    
-    // Log para verificar o conteúdo do FormData
-    console.log('Conteúdo do FormData:');
-    for (let [key, value] of formData.entries()) {
-        if (value instanceof File) {
-            console.log(`${key}: ${value.name} (${value.size} bytes)`); // Imprime o nome e o tamanho do arquivo
-        } else {
-            console.log(`${key}: ${value}`); // Imprime outros valores
-        }
-    }
     
     try {
-        showLoading();
-        console.log('Enviando requisição para o servidor');
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        // Capturar os containers de imagem
+        const imageContainers = Array.from(document.querySelectorAll('.image-preview-item'));
+        const imageInput = document.getElementById('images');
+        const files = Array.from(imageInput.files);
+        
+        // Limpar imagens existentes e imageOrder do FormData
+        formData.delete('images');
+        formData.delete('imageOrder');
+        
+        // Criar array com a ordem atual das imagens
+        const imageOrder = imageContainers.map(container => 
+            parseInt(container.getAttribute('data-original-index'))
+        ).filter(index => !isNaN(index));
+
+        // Adicionar imagens na ordem original
+        files.forEach((file, index) => {
+            console.log(`Adicionando imagem ${index} ao FormData`);
+            formData.append('images', file);
+        });
+
+        // Adicionar a ordem como JSON
+        formData.append('imageOrder', JSON.stringify(imageOrder));
+
+        // Adicionar o conteúdo do editor
+        const description = editor.getData();
+        formData.set('description', description);
+
+        // Adicionar campos booleanos
+        ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator', 'hasPromotion'].forEach(field => {
+            const checkbox = document.getElementById(field);
+            formData.set(field, checkbox ? checkbox.checked : false);
+        });
+
+        // Log para debug
+        console.log('Ordem das imagens:', imageOrder);
+        for (let [key, value] of formData.entries()) {
+            if (key === 'images') {
+                console.log('images:', value.name);
+            } else {
+                console.log(`${key}:`, value);
+            }
+        }
+
+        // Enviar para o servidor
         const response = await fetch(`${API_BASE_URL}/api/properties`, {
             method: 'POST',
             headers: {
@@ -206,23 +164,22 @@ async function handleSubmit(event) {
             body: formData
         });
 
-        console.log('Resposta recebida:', response.status);
-        const data = await response.json();
-        console.log('Dados da resposta:', data);
-
         if (!response.ok) {
-            throw new Error(data.message || 'Falha ao adicionar propriedade');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao criar propriedade');
         }
 
+        const data = await response.json();
+        console.log('Propriedade criada com sucesso:', data);
+        
         showNotification('Propriedade adicionada com sucesso!', 'success');
-        form.reset(); // Limpa o formulário após o sucesso
-        document.getElementById('image-preview').innerHTML = ''; // Limpa as miniaturas
-        setupImagePreview();
+        setTimeout(() => {
+            window.location.href = 'properties.html';
+        }, 2000);
+
     } catch (error) {
         console.error('Erro ao adicionar propriedade:', error);
         showNotification(`Erro ao adicionar propriedade: ${error.message}`, 'error');
-    } finally {
-        hideLoading();
     }
 }
 

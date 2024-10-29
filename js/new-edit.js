@@ -4,6 +4,7 @@ import { renderMenu } from './menu.js';
 
 let currentProperty = null;
 let editor = null;
+let imagesToDelete = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     checkPermission(['corretor', 'administrador']);
@@ -69,7 +70,7 @@ async function loadPropertyData() {
 
 function populateForm(property) {
     const form = document.getElementById('edit-property-form');
-    form.innerHTML = ''; // Limpa o formulário antes de preencher
+    form.innerHTML = '';
 
     // Exibição da Propriedade
     form.innerHTML += `
@@ -219,8 +220,9 @@ function populateForm(property) {
             <input type="date" id="exclusivityEndDate" name="exclusivityEndDate" value="${property.exclusivityContract?.endDate?.split('T')[0] || ''}">
         </div>
         <div class="form-group">
-            <label for="hasPromotion">Tem Promoção</label>
-            <input type="checkbox" id="hasPromotion" name="exclusivityContract.hasPromotion" ${property.exclusivityContract?.hasPromotion ? 'checked' : ''}>
+            <label for="hasPromotion">Tem Promoção?</label>
+            <input type="checkbox" id="hasPromotion" name="hasPromotion" 
+                ${property.exclusivityContract?.hasPromotion ? 'checked' : ''}>
         </div>
 
         <h2>Detalhes Adicionais</h2>
@@ -247,34 +249,18 @@ function populateForm(property) {
         <button type="submit" class="submit-btn">Salvar Alterações</button>
     `;
 
-    // Inicializar o CKEditor
-    ClassicEditor
-        .create(document.querySelector('#description'), {
-            toolbar: [
-                'heading',
-                '|',
-                'bold',
-                'italic',
-                'link',
-                'bulletedList',
-                'numberedList',
-                '|',
-                'outdent',
-                'indent',
-                '|',
-                'blockQuote',
-                'undo',
-                'redo'
-            ],
-            language: 'pt-br',
-            placeholder: 'Descreva a propriedade em detalhes...'
-        })
-        .then(newEditor => {
-            editor = newEditor;
-        })
-        .catch(error => {
-            console.error('Erro ao inicializar o editor:', error);
-        });
+    // Inicializar CKEditor após adicionar o textarea
+    if (ClassicEditor) {
+        ClassicEditor
+            .create(document.querySelector('#description'))
+            .then(newEditor => {
+                editor = newEditor;
+                console.log('Editor inicializado:', editor);
+            })
+            .catch(error => {
+                console.error('Erro ao inicializar o editor:', error);
+            });
+    }
 
     // Adicione o event listener para o select após a criação do elemento
     const propertyTypeSelect = document.getElementById('propertyType');
@@ -304,145 +290,144 @@ function populateForm(property) {
     form.addEventListener('submit', handleSubmit);
 }
 
-let imagesToDelete = []; // Array para armazenar imagens a serem excluídas
-
 function setupImagePreview(property) {
-    const existingImagesContainer = document.getElementById('image-preview');
+    const previewContainer = document.getElementById('image-preview');
+    const imageInput = document.getElementById('images');
 
-    if (!existingImagesContainer) {
-        console.error('Elemento image-preview não encontrado');
+    if (!previewContainer) {
+        console.error('Container de preview não encontrado');
         return;
     }
 
-    existingImagesContainer.innerHTML = '';
+    previewContainer.innerHTML = '';
 
     if (property && property.images && property.images.length > 0) {
-        property.images.forEach((image, index) => {
-            const imgContainer = document.createElement('div');
-            imgContainer.className = 'image-preview-item';
-            imgContainer.setAttribute('data-src', image);
-
-            const img = document.createElement('img');
-            img.src = `${API_BASE_URL}${image}`;
-            img.alt = `Imagem ${index + 1}`;
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'remove-image';
-            removeButton.textContent = 'X';
-            removeButton.onclick = () => {
-                // Armazenar o caminho da imagem a ser excluída
-                imagesToDelete.push(image);
-                imgContainer.remove(); // Remover a imagem do DOM
-                console.log(`Imagem ${index} marcada para exclusão: ${image}`);
-            };
-
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(removeButton);
-            existingImagesContainer.appendChild(imgContainer);
+        property.images.forEach((imagePath, index) => {
+            if (!imagesToDelete.includes(imagePath)) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                previewItem.setAttribute('data-index', index);
+                previewItem.setAttribute('data-src', imagePath);
+                
+                const imageUrl = imagePath.startsWith('http') ? imagePath : `${API_BASE_URL}${imagePath}`;
+                
+                previewItem.innerHTML = `
+                    <img src="${imageUrl}" alt="Imagem ${index + 1}">
+                    <span class="image-position">${index + 1}</span>
+                    <button type="button" class="remove-image">&times;</button>
+                `;
+                
+                const removeButton = previewItem.querySelector('.remove-image');
+                removeButton.addEventListener('click', () => {
+                    imagesToDelete.push(imagePath);
+                    previewItem.remove();
+                    updateImageOrder();
+                    console.log('Imagens para deletar:', imagesToDelete);
+                });
+                
+                previewContainer.appendChild(previewItem);
+            }
         });
     }
 
-    new Sortable(existingImagesContainer, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        onEnd: updateImageOrder
+    // Adicionar listener para novas imagens
+    imageInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        const currentCount = document.querySelectorAll('.image-preview-item').length;
+        
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            const previewItem = document.createElement('div');
+            
+            previewItem.className = 'image-preview-item';
+            previewItem.setAttribute('data-index', currentCount + index);
+            previewItem.setAttribute('data-is-new', 'true');
+            
+            reader.onload = function(e) {
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Nova Imagem ${currentCount + index + 1}">
+                    <span class="image-position">${currentCount + index + 1}</span>
+                    <button type="button" class="remove-image">&times;</button>
+                `;
+                
+                const removeButton = previewItem.querySelector('.remove-image');
+                removeButton.addEventListener('click', () => {
+                    previewItem.remove();
+                    updateImageOrder();
+                });
+            };
+            
+            reader.readAsDataURL(file);
+            previewContainer.appendChild(previewItem);
+        });
+        
+        updateImageOrder();
     });
 
-    console.log('setupImagePreview concluído');
-}
-
-function handleNewImages(event) {
-    const files = event.target.files;
-    const existingImagesContainer = document.getElementById('image-preview');
-
-    for (let file of files) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const imgContainer = document.createElement('div');
-            imgContainer.className = 'image-preview-item';
-            imgContainer.setAttribute('data-index', existingImagesContainer.children.length);
-
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.alt = `Nova Imagem ${existingImagesContainer.children.length + 1}`;
-
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'remove-image';
-            removeButton.textContent = 'X';
-            removeButton.onclick = () => removeImage(existingImagesContainer.children.length, imgContainer);
-
-            imgContainer.appendChild(img);
-            imgContainer.appendChild(removeButton);
-            existingImagesContainer.appendChild(imgContainer);
-        }
-        reader.readAsDataURL(file);
-    }
-}
-
-function removeImage(index, imgContainer) {
-    imgContainer.remove();
-    updateImageOrder();
+    // Inicializar Sortable
+    new Sortable(previewContainer, {
+        animation: 150,
+        onEnd: updateImageOrder
+    });
 }
 
 async function handleSubmit(event) {
     event.preventDefault();
-    console.log('Iniciando submissão do formulário');
-
-    const form = event.target;
-    const formData = new FormData(form);
-
-    // Pegar o conteúdo do editor
-    const description = editor.getData().trim();
-    if (!description) {
-        showNotification('A descrição é obrigatória', 'error');
-        return;
-    }
-    formData.set('description', description);
-
-    // Capturar a ordem atual das imagens
-    const currentImages = Array.from(document.querySelectorAll('.image-preview-item'))
-        .map(item => item.getAttribute('data-src'))
-        .filter(src => src); // Remove valores nulos ou vazios
-
-    console.log('Imagens atuais (ordem atualizada):', currentImages);
-
-    // Adicionar imagens existentes na ordem atual
-    if (currentImages.length > 0) {
-        formData.set('existingImages', JSON.stringify(currentImages));
-    } else {
-        // Se não houver imagens, envie um array vazio
-        formData.set('existingImages', JSON.stringify([]));
-    }
-
-    // Adicionar imagens a serem excluídas
-    if (imagesToDelete.length > 0) {
-        formData.set('imagesToDelete', JSON.stringify(imagesToDelete));
-    }
-
-    // Adicionar novas imagens
-    const newImagesInput = form.querySelector('#new-images');
-    if (newImagesInput && newImagesInput.files.length > 0) {
-        Array.from(newImagesInput.files).forEach(file => {
-            formData.append('newImages', file);
-        });
-    }
-
-    // Capturar valores dos checkboxes
-    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        formData.set(checkbox.name, checkbox.checked); // Adiciona o valor do checkbox ao FormData
-    });
-
-    // Log para verificar o conteúdo do FormData
-    for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-    }
-
+    
     try {
         showLoading();
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        // Adicionar conteúdo do editor
+        if (editor) {
+            const description = editor.getData();
+            formData.set('description', description);
+            console.log('Conteúdo do editor:', description);
+        }
+
+        // Processar checkboxes incluindo hasPromotion
+        ['isCondominium', 'hasBackyard', 'hasBalcony', 'hasElevator', 'hasPromotion'].forEach(field => {
+            const checkbox = document.getElementById(field);
+            if (checkbox) {
+                formData.set(field, checkbox.checked.toString());
+            }
+        });
+
+        // Processar datas do contrato de exclusividade se existirem
+        if (formData.get('exclusivityStartDate') || formData.get('exclusivityEndDate')) {
+            formData.set('exclusivityContract.startDate', formData.get('exclusivityStartDate'));
+            formData.set('exclusivityContract.endDate', formData.get('exclusivityEndDate'));
+            delete formData.exclusivityStartDate;
+            delete formData.exclusivityEndDate;
+        }
+
+        // Processar imagens
+        const imageContainers = Array.from(document.querySelectorAll('.image-preview-item'));
+        
+        formData.delete('images');
+        formData.delete('existingImages');
+        
+        const existingImages = imageContainers
+            .filter(container => !container.getAttribute('data-is-new'))
+            .map(container => container.getAttribute('data-src'))
+            .filter(src => src && !imagesToDelete.includes(src));
+        
+        formData.append('existingImages', JSON.stringify(existingImages));
+        
+        // Adicionar novas imagens
+        const imageInput = document.getElementById('images');
+        if (imageInput.files.length > 0) {
+            Array.from(imageInput.files).forEach(file => {
+                formData.append('images', file);
+            });
+        }
+        
+        // Adicionar imagens para deletar
+        if (imagesToDelete.length > 0) {
+            formData.append('imagesToDelete', JSON.stringify(imagesToDelete));
+        }
+
         const response = await fetch(`${API_BASE_URL}/api/properties/${currentProperty._id}`, {
             method: 'PATCH',
             headers: {
@@ -451,19 +436,21 @@ async function handleSubmit(event) {
             body: formData
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Falha ao atualizar propriedade');
+            throw new Error(data.message || 'Erro ao atualizar propriedade');
         }
 
-        const data = await response.json();
-        console.log('Resposta do servidor:', data);
-
+        currentProperty = data.data.property;
+        imagesToDelete = []; // Limpar array após sucesso
+        
         showNotification('Propriedade atualizada com sucesso!', 'success');
-        setTimeout(() => window.location.href = 'manage-properties.html', 2000);
+        await loadPropertyData();
+        
     } catch (error) {
         console.error('Erro ao atualizar propriedade:', error);
-        showNotification(`Erro ao atualizar propriedade: ${error.message}`, 'error');
+        showNotification(error.message || 'Erro ao atualizar propriedade', 'error');
     } finally {
         hideLoading();
     }

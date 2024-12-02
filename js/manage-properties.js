@@ -238,14 +238,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
         const modal = document.getElementById('property-details-modal');
         const modalContent = modal.querySelector('.modal-content');
-        document.getElementById('share-facebook-btn').onclick = () => {
-            const formattedProperty = {
-                ...property,
-                description: `${property.propertyType} com ${property.bedrooms} quartos, ${property.socialBathrooms} banheiros, ${property.totalArea}m². ${property.description}`,
-                images: property.images.map(img => `${window.location.origin}${img}`)
-            };
-            shareOnFacebook(formattedProperty);
-        };
+        document.getElementById('share-facebook-btn').removeAttribute('hidden');
 
         // Garantir que haja pelo menos 3 imagens para o carrossel
         const images = property.images && property.images.length >= 3 ? property.images :
@@ -345,14 +338,21 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
                 </div>
             </div>
             <div class="property-modal-actions">
-                <a href="new-edit.html?id=${property._id}" class="btn btn-primary">Editar Propriedade</a>
-                <button id="share-facebook-btn" class="btn btn-social btn-facebook" hidden>
+                <button class="btn btn-social btn-primary" onclick="window.location.href='new-edit.html?id=${property._id}'">
+                    <i class="fas fa-edit"></i> Editar Propriedade
+                </button>
+                <button id="copy-link-btn" class="btn btn-social btn-info">
+                    <i class="fas fa-link"></i> Copiar Link
+                </button>
+                <button id="share-facebook-btn" class="btn btn-social btn-facebook">
                     <i class="fab fa-facebook-f"></i> Compartilhar no Facebook
                 </button>
                 <button id="share-instagram-btn" class="btn btn-social btn-instagram">
                     <i class="fab fa-instagram"></i> Compartilhar no Instagram
                 </button>
-                <button hidden class="btn btn-secondary delete-btn" data-id="${property._id}">Excluir Propriedade</button>
+                <button class="btn btn-social btn-danger action-btn delete-btn" data-id="${property._id}">
+                    <i class="fas fa-trash-alt"></i> Excluir Propriedade
+                </button>
             </div>
         `;
 
@@ -360,6 +360,12 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
         // Inicializar o Swiper após a modal ser exibida
         initializeModalCarousel();
+
+        // Adicionar event listener para o botão de exclusão na modal
+        const modalDeleteBtn = modal.querySelector('.delete-btn');
+        if (modalDeleteBtn) {
+            modalDeleteBtn.addEventListener('click', deleteProperty);
+        }
 
         const closeBtn = modal.querySelector('.close');
         closeBtn.onclick = function () {
@@ -374,6 +380,19 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
         document.getElementById('share-facebook-btn').onclick = () => shareOnFacebook(property);
         document.getElementById('share-instagram-btn').onclick = () => shareOnInstagram(property);
+
+        // Adicionar o event listener para o botão de copiar link
+        document.getElementById('copy-link-btn').addEventListener('click', () => {
+            const propertyUrl = `${window.location.origin}/property-details.html?id=${property._id}`;
+            navigator.clipboard.writeText(propertyUrl)
+                .then(() => {
+                    showNotification('Link copiado com sucesso!', 'success');
+                })
+                .catch(err => {
+                    console.error('Erro ao copiar link:', err);
+                    showNotification('Erro ao copiar link', 'error');
+                });
+        });
 
     } catch (error) {
         console.error('Erro ao carregar detalhes da propriedade:', error);
@@ -539,28 +558,22 @@ function initializeModalCarousel() {
 }
 
 function shareOnFacebook(property) {
+    const imageUrl = property.images && property.images.length > 0 
+        ? `${API_BASE_URL}${property.images[0]}`
+        : 'https://placehold.co/600x400?text=Imagem+não+encontrada';
+
+    const description = `${property.propertyType} com ${property.bedrooms} quartos, ${property.socialBathrooms} banheiros, ${property.totalArea}m². ${property.description || ''}`;
+
     FB.ui({
-        method: 'share_open_graph',
-        action_type: 'og.shares',
-        action_properties: JSON.stringify({
-            object: {
-                'og:url': window.location.href,
-                'og:title': `Excelente oportunidade: ${property.title}`,
-                'og:description': `${property.description.substring(0, 200)}...`,
-                'og:image': property.images[0],
-                'og:image:width': '1200',
-                'og:image:height': '630',
-                'og:type': 'website',
-                'og:site_name': 'Parcero Imóveis',
-                'og:price:amount': property.salePrice,
-                'og:price:currency': 'BRL',
-            }
-        })
+        method: 'share',
+        href: window.location.href,
+        quote: `${property.title}\n${description}\nPreço: R$ ${property.salePrice.toLocaleString('pt-BR')}`,
+        hashtag: '#ParceroImoveis'
     }, function(response) {
         if (response && !response.error_message) {
-            alert('Compartilhado com sucesso!');
+            showNotification('Compartilhado com sucesso!', 'success');
         } else {
-            alert('Erro ao compartilhar. Por favor, tente novamente.');
+            showNotification('Erro ao compartilhar. Por favor, tente novamente.', 'error');
         }
     });
 }

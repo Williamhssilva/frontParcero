@@ -65,9 +65,9 @@ async function fetchPropertyDetails(propertyId) {
 function displayPropertyDetails(property) {
     console.log('Propriedade recebida para exibição:', property);
     
-    // Atualizar título e endereço
+    // Atualizar título e endereço !!* No momento não exibiremos o endereço da propriedade *!!
     document.getElementById('property-title').textContent = property.property.title || 'Título não disponível';
-    document.getElementById('property-address').textContent = `${property.property.address || ''}, ${property.property.neighborhood || ''}, ${property.property.captureCity || ''}`;
+    //document.getElementById('property-address').textContent = `${property.property.address || ''}, ${property.property.neighborhood || ''}, ${property.property.captureCity || ''}`;
 
     // Atualizar galeria de imagens
     updatePropertyImages(property.property.images || []);
@@ -83,7 +83,7 @@ function displayPropertyDetails(property) {
         <div class="feature"><i class="fas fa-ruler-combined"></i> ${property.property.totalArea || 0} m² total</div>
         <div class="feature"><i class="fas fa-vector-square"></i> ${property.property.builtArea || 0} m² construídos</div>
         <div class="feature"><i class="fas fa-car"></i> ${property.property.garages || 0} vagas</div> 
-        <div class="feature"><i class="fas fa-building"></i> ${property.property.propertyType || 'Tipo não informado'}</div>
+        <div class="feature"><i class="fas ${property.property.propertyType?.toLowerCase() === 'casa' ? 'fa-home' : 'fa-building'}"></i> ${property.property.propertyType || 'Tipo não informado'}</div>
     `;
 
     // Atualizar descrição
@@ -140,13 +140,13 @@ function displayPropertyDetails(property) {
     document.getElementById('favorite-btn').onclick = () => toggleFavorite(property.property._id);
 
     // Exibir data de captura e corretor responsável
-    const captureInfo = document.createElement('div');
-    captureInfo.className = 'capture-info';
-    captureInfo.innerHTML = `
-        <p>Capturado em: ${new Date(property.property.captureDate).toLocaleDateString('pt-BR')}</p>
-        <p>Corretor responsável: ${property.property.capturedByName || 'Não informado'}</p>
-    `;
-    document.getElementById('property-details').appendChild(captureInfo);
+    //const captureInfo = document.createElement('div');
+    //captureInfo.className = 'capture-info';
+    //captureInfo.innerHTML = `
+    //    <p>Capturado em: ${new Date(property.property.captureDate).toLocaleDateString('pt-BR')}</p>
+    //    <p>Corretor responsável: ${property.property.capturedByName || 'Não informado'}</p>
+    //`;
+    //document.getElementById('property-details').appendChild(captureInfo);
 }
 
 function updatePropertyImages(images) {

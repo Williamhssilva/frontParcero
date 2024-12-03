@@ -383,7 +383,7 @@ window.showPropertyDetails = async function showPropertyDetails(propertyId) {
 
         // Adicionar o event listener para o botão de copiar link
         document.getElementById('copy-link-btn').addEventListener('click', () => {
-            const propertyUrl = `${window.location.origin}/property-details.html?id=${property._id}`;
+            const propertyUrl = `${window.location.origin}/frontParcero/property-details.html?id=${property._id}`;
             navigator.clipboard.writeText(propertyUrl)
                 .then(() => {
                     showNotification('Link copiado com sucesso!', 'success');

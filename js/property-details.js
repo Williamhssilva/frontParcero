@@ -137,7 +137,27 @@ function displayPropertyDetails(property) {
 
     // Configurar botões de ação
     document.getElementById('request-visit-btn').onclick = () => requestVisit(property.property._id);
-    document.getElementById('favorite-btn').onclick = () => toggleFavorite(property.property._id);
+    //document.getElementById('favorite-btn').onclick = () => toggleFavorite(property.property._id);
+
+    function requestVisit(propertyId) {
+        // Número do WhatsApp do corretor (substitua pelo número real)
+        const phoneNumber = '553499250380';
+        
+        // Obtém o título e preço do imóvel
+        const propertyTitle = document.getElementById('property-title').textContent;
+        const propertyPrice = document.getElementById('property-price').textContent;
+        
+        // Monta a mensagem
+        const message = encodeURIComponent(
+            `Olá! Vi o imóvel "${propertyTitle}" (${propertyPrice}) no site e gostaria de agendar uma visita. ID do imóvel: ${propertyId}`
+        );
+        
+        // Cria o link do WhatsApp
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+        
+        // Abre em uma nova aba
+        window.open(whatsappUrl, '_blank');
+    }
 
     // Exibir data de captura e corretor responsável
     //const captureInfo = document.createElement('div');

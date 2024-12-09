@@ -1,6 +1,6 @@
 import { API_BASE_URL } from './config.js';
 import { renderMenu } from './menu.js';
-import { authenticatedFetch } from './utils.js';
+import { authenticatedFetch, publicFetch } from './utils.js';
 
 let galleryTop;
 let galleryThumbs;
@@ -32,37 +32,27 @@ export function initPropertyDetails() {
 
 async function fetchPropertyDetails(propertyId) {
     try {
-        console.log('Iniciando busca de detalhes da propriedade');
-        const url = `${API_BASE_URL}/api/properties/${propertyId}`;
-        console.log('URL da requisição:', url);
+        const url = `${API_BASE_URL}/api/public/properties/${propertyId}`;
+        const data = await publicFetch(url);
         
-        const response = await authenticatedFetch(url);
-        console.log('Resposta da API:', response);
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Erro ao buscar detalhes da propriedade:', errorData);
-            throw new Error(`Erro: ${errorData.message || 'Erro desconhecido'}`);
-        }
-        
-        const data = await response.json();
-        console.log('Dados recebidos da API:', data);
-        
-        // Ajuste aqui para acessar a propriedade corretamente
-        if (data.status === 'success' && data.data) {
-            displayPropertyDetails(data.data); // Acesse data.data diretamente
-            loadSimilarProperties(data.data); // Acesse data.data diretamente
+        if (data && data.status === 'success' && data.data && data.data.property) {
+            displayPropertyDetails(data.data);
+            loadSimilarProperties(data.data);
         } else {
-            console.error('Dados recebidos:', data); // Log para depuração
-            throw new Error('Formato de dados inválido ou propriedade não encontrada');
+            throw new Error('Dados da propriedade não encontrados ou formato inválido');
         }
     } catch (error) {
         console.error('Erro ao carregar detalhes da propriedade:', error);
-        displayError('Não foi possível carregar os detalhes da propriedade');
+        displayError('Não foi possível carregar os detalhes da propriedade. Por favor, tente novamente mais tarde.');
     }
 }
 
 function displayPropertyDetails(property) {
+    if (!property || !property.property) {
+        displayError('Dados da propriedade não disponíveis');
+        return;
+    }
+    
     console.log('Propriedade recebida para exibição:', property);
     
     // Atualizar título e endereço !!* No momento não exibiremos o endereço da propriedade *!!
@@ -231,18 +221,38 @@ function initializeCarousel() {
 
 async function loadSimilarProperties(property) {
     try {
-        const response = await authenticatedFetch(`${API_BASE_URL}/api/properties/${property.property._id}/similar`);
-        if (!response.ok) {
-            throw new Error('Falha ao carregar propriedades similares');
-        }
-        const data = await response.json();
-        console.log('Dados de propriedades similares recebidos:', data);
-        
-        if (data.status === 'success' && data.data && Array.isArray(data.data.similarProperties)) {
-            displaySimilarProperties(data.data.similarProperties);
-        } else {
-            console.error('Formato de dados inválido para propriedades similares:', data);
+        if (!property || !property.property || !property.property._id) {
+            console.warn('Dados da propriedade inválidos para buscar similares');
             displaySimilarProperties([]);
+            return;
+        }
+
+        // Tenta buscar propriedades similares
+        try {
+            const response = await publicFetch(`${API_BASE_URL}/api/public/properties/${property.property._id}/similar`);
+            
+            if (response && response.data && Array.isArray(response.data.similarProperties)) {
+                displaySimilarProperties(response.data.similarProperties);
+            } else {
+                console.warn('Formato inválido de propriedades similares');
+                displaySimilarProperties([]);
+            }
+        } catch (error) {
+            // Se a rota não existir ou retornar erro, busca todas as propriedades
+            const allPropertiesResponse = await publicFetch(`${API_BASE_URL}/api/public/properties`);
+            
+            if (allPropertiesResponse && allPropertiesResponse.data && Array.isArray(allPropertiesResponse.data.properties)) {
+                // Filtra para mostrar apenas 3 propriedades diferentes da atual
+                const similarProperties = allPropertiesResponse.data.properties
+                    .filter(p => p.property._id !== property.property._id)
+                    .slice(0, 3)
+                    .map(p => ({ property: p.property }));
+                
+                displaySimilarProperties(similarProperties);
+            } else {
+                console.warn('Não foi possível carregar propriedades alternativas');
+                displaySimilarProperties([]);
+            }
         }
     } catch (error) {
         console.error('Erro ao carregar propriedades similares:', error);
@@ -251,8 +261,6 @@ async function loadSimilarProperties(property) {
 }
 
 function displaySimilarProperties(properties) {
-    console.log('Propriedades similares para renderizar:', properties);
-
     const propertiesGrid = document.querySelector('#similar-properties .properties-grid');
     if (!propertiesGrid) {
         console.error('Elemento properties-grid não encontrado');
@@ -260,14 +268,19 @@ function displaySimilarProperties(properties) {
     }
 
     if (!Array.isArray(properties) || properties.length === 0) {
-        console.log('Nenhuma propriedade similar encontrada ou formato inválido');
-        propertiesGrid.innerHTML = '<p>Nenhuma propriedade similar encontrada.</p>';
+        propertiesGrid.innerHTML = '<p class="no-similar">Nenhuma propriedade similar disponível no momento.</p>';
         return;
     }
 
     propertiesGrid.innerHTML = properties.map(property => `
         <div class="property-card" onclick="window.location.href='property-details.html?id=${property.property._id}'">
-            <div class="property-image" style="background-image: url('${property.property.images && property.property.images.length > 0 ? property.property.images[0] : 'https://via.placeholder.com/300x200.png?text=Imóvel+Similar'}')"></div>
+            <div class="property-image">
+                <img src="${property.property.images && property.property.images.length > 0 
+                    ? `${API_BASE_URL}${property.property.images[0]}` 
+                    : 'https://via.placeholder.com/300x200.png?text=Imóvel+Similar'}"
+                    onerror="this.src='https://via.placeholder.com/300x200.png?text=Imóvel+Similar'"
+                    alt="Imagem do imóvel">
+            </div>
             <div class="property-card-info">
                 <h3 class="property-card-title">${property.property.title || 'Título não disponível'}</h3>
                 <p class="property-card-price">${property.property.salePrice ? `R$ ${property.property.salePrice.toLocaleString('pt-BR')}` : 'Preço não informado'}</p>
@@ -280,8 +293,6 @@ function displaySimilarProperties(properties) {
             </div>
         </div>
     `).join('');
-
-    console.log('Propriedades similares renderizadas:', properties.length);
 }
 
 function displayError(message) {

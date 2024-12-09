@@ -25,3 +25,17 @@ export async function authenticatedFetch(url, options = {}) {
 
     return response;
 }
+
+export async function publicFetch(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro desconhecido');
+        }
+        return response.json();
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        throw error;
+    }
+}

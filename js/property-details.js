@@ -13,11 +13,7 @@ export function initPropertyDetails() {
     }
     propertyDetailsInitialized = true;
 
-    const detailsContainer = document.getElementById('property-details');
-    if (!detailsContainer) {
-        console.log('Elemento property-details não encontrado. Provavelmente não estamos na página de detalhes.');
-        return;
-    }
+    
 
     const urlParams = new URLSearchParams(window.location.search);
     const propertyId = urlParams.get('id');
@@ -79,51 +75,9 @@ function displayPropertyDetails(property) {
     // Atualizar descrição
     document.getElementById('property-description-text').innerHTML = property.property.description || 'Descrição não disponível';
 
-    // Atualizar detalhes
-    const detailsContainer = document.getElementById('property-details-list');
-    detailsContainer.innerHTML = `
-        <div class="details-grid">
-            <div class="details-column">
-                <h3>Informações Básicas</h3>
-                <ul>
-                    <li><i class="fas fa-home"></i> Tipo: ${property.property.propertyType || 'Não informado'}</li>
-                    <li><i class="fas fa-chart-area"></i> Área total: ${property.property.totalArea || 0} m²</li>
-                    <li><i class="fas fa-vector-square"></i> Área construída: ${property.property.builtArea || 0} m²</li>
-                    <li><i class="fas fa-bed"></i> Quartos: ${property.property.bedrooms || 0}</li>
-                    <li><i class="fas fa-bath"></i> Banheiros: ${property.property.socialBathrooms || 0}</li> 
-                    <li><i class="fas fa-car"></i> Vagas: ${property.property.garages || 0}</li> 
-                </ul>
-            </div>
-            <div class="details-column">
-                <h3>Características Adicionais</h3>
-                <ul>
-                    <li><i class="fas fa-calendar-alt"></i> Ano de construção: ${property.property.yearOfConstruction || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
-                    <li><i class="fas fa-sun"></i> Orientação solar: ${property.property.solarOrientation || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
-                    <li><i class="fas fa-building"></i> Andar: ${property.property.floor || 'Não informado'}</li> <!-- Verifique se existe no modelo -->
-                </ul>
-            </div>
-            <div class="details-column">
-                <h3>Informações Financeiras</h3>
-                <ul>
-                    <li><i class="fas fa-dollar-sign"></i> Condomínio: R$ ${property.property.condominiumFee ? property.property.condominiumFee.toLocaleString('pt-BR') : 'Não informado'}</li> <!-- Verifique se existe no modelo -->
-                    <li><i class="fas fa-file-invoice-dollar"></i> IPTU: R$ ${property.property.iptu ? property.property.iptu.toLocaleString('pt-BR') : 'Não informado'}</li> <!-- Verifique se existe no modelo -->
-                </ul>
-            </div>
-        </div>
-    `;
+    
 
-    // Adicionar comodidades se disponíveis
-    if (property.property.amenities && property.property.amenities.length > 0) {
-        const amenitiesColumn = document.createElement('div');
-        amenitiesColumn.className = 'details-column';
-        amenitiesColumn.innerHTML = `
-            <h3>Comodidades</h3>
-            <ul>
-                ${property.property.amenities.map(amenity => `<li><i class="fas fa-check"></i> ${amenity}</li>`).join('')}
-            </ul>
-        `;
-        detailsContainer.querySelector('.details-grid').appendChild(amenitiesColumn);
-    }
+    
 
     // Configurar botões de ação
     document.getElementById('request-visit-btn').onclick = () => requestVisit(property.property._id);
@@ -295,16 +249,7 @@ function displaySimilarProperties(properties) {
     `).join('');
 }
 
-function displayError(message) {
-    const detailsContainer = document.getElementById('property-details');
-    if (detailsContainer) {
-        detailsContainer.innerHTML = `
-            <h2>Erro</h2>
-            <p>${message}</p>
-            <a href="index.html">Voltar para a página inicial</a>
-        `;
-    }
-}
+
 
 // Mantenha as funções requestVisit e toggleFavorite como estavam antes
 

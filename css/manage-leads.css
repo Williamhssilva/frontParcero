@@ -399,3 +399,160 @@
 .unlink-property-btn:hover {
     color: #ff0000;
 }
+
+/* Estilos para a modal de documentos */
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.document-info i {
+    font-size: 24px;
+    color: #6c757d;
+}
+
+.document-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.document-name {
+    font-size: 14px;
+    color: #212529;
+}
+
+.document-type {
+    font-size: 12px;
+    color: #6c757d;
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.document-date {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.document-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-download, .btn-preview {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.btn-download:hover {
+    color: #0d6efd;
+}
+
+.btn-preview:hover {
+    color: #198754;
+}
+
+/* Estilos para o formulário de upload */
+#document-upload-form {
+    padding: 16px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.file-info {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Estilos para preview de imagem */
+.preview-modal .modal-content {
+    max-width: 90%;
+    max-height: 90vh;
+    padding: 16px;
+}
+
+.preview-modal img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: calc(90vh - 32px);
+    object-fit: contain;
+}
+
+/* Loading e mensagens */
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.no-documents {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.error {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .document-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .document-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+.btn-delete {
+    background-color: transparent;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.document-actions {
+    display: flex;
+    gap: 8px;
+}

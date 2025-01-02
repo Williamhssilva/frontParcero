@@ -521,50 +521,58 @@ function showStageActions(leadId) {
         novo: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         visita: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Agendar visita', action: () => scheduleVisit(lead) },
             { name: 'Preparar material de apresentação', action: () => preparePresentationMaterial(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         negociacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Enviar proposta', action: () => sendProposal(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         qualificacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como qualificado', action: () => markAsQualified(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         apresentacao: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como apresentado', action: () => markAsPresented(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         contrato: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como contrato assinado', action: () => markAsContractSigned(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         concluido: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como concluído', action: () => markAsCompleted(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ],
         posvenda: [
             { name: 'Excluir', action: () => deleteLead(leadId) },
             { name: 'Editar', action: () => showEditLeadForm(leadId) },
             { name: 'Marcar como proposta enviada', action: () => markAsProposalSent(lead) },
-            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) }
+            { name: 'Vincular Imóvel', action: () => openPropertySearchModal(leadId) },
+            { name: 'Documentos', action: () => showDocumentsModal(leadId) }
         ]
     };
 
@@ -974,4 +982,356 @@ async function unlinkProperty(leadId) {
         showNotification('Erro ao desvincular imóvel. Tente novamente.', 'error');
     }
 }
+
+function showDocumentsModal(leadId) {
+    currentLead = { _id: leadId };
+    const modal = document.getElementById('documents-modal');
+    const documentsList = modal.querySelector('.documents-list');
+    
+    // Limpar lista e mostrar loading
+    documentsList.innerHTML = '<div class="loading">Carregando documentos...</div>';
+    modal.style.display = 'block';
+
+    // Configurar o formulário
+    const form = document.getElementById('document-upload-form');
+    form.onsubmit = async function(e) {
+        e.preventDefault();
+        await handleDocumentUpload(e, leadId);
+    };
+
+    // Carregar documentos existentes
+    loadDocuments(leadId);
+
+    // Configurar fechamento da modal
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = () => modal.style.display = 'none';
+
+    window.onclick = (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    };
+}
+
+async function loadDocuments(leadId) {
+    const documentsList = document.querySelector('.documents-list');
+    
+    try {
+        documentsList.innerHTML = '<div class="loading">Carregando documentos...</div>';
+
+        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}/documents`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao carregar documentos');
+        }
+
+        const data = await response.json();
+        console.log('Documentos carregados:', data); // Log para debug
+        
+        if (!data.data || data.data.length === 0) {
+            documentsList.innerHTML = `
+                <div class="no-documents">
+                    <i class="fas fa-file-alt"></i>
+                    <p>Nenhum documento encontrado</p>
+                </div>`;
+            return;
+        }
+
+        documentsList.innerHTML = '';
+        data.data.forEach(doc => {
+            const docElement = createDocumentElement(doc);
+            documentsList.appendChild(docElement);
+        });
+
+    } catch (error) {
+        console.error('Erro ao carregar documentos:', error);
+        documentsList.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${error.message}</p>
+            </div>`;
+    }
+}
+
+// Adicionar constantes para tipos de arquivo
+const ALLOWED_FILE_TYPES = {
+    'application/pdf': 'PDF',
+    'application/msword': 'DOC',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'application/vnd.ms-excel': 'XLS',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'image/jpeg': 'JPG',
+    'image/png': 'PNG',
+    'text/plain': 'TXT'
+};
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+async function handleDocumentUpload(e, leadId) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const fileInput = form.querySelector('input[type="file"]');
+    const documentTypeSelect = form.querySelector('select[name="documentType"]');
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    try {
+        // Validações
+        if (!fileInput.files[0]) {
+            throw new Error('Por favor, selecione um arquivo');
+        }
+
+        if (!documentTypeSelect.value) {
+            throw new Error('Por favor, selecione o tipo do documento');
+        }
+
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+        const formData = new FormData();
+        formData.append('document', fileInput.files[0]);
+        formData.append('documentType', documentTypeSelect.value);
+
+        console.log('Enviando arquivo:', {
+            fileName: fileInput.files[0].name,
+            fileSize: fileInput.files[0].size,
+            fileType: fileInput.files[0].type,
+            documentType: documentTypeSelect.value
+        });
+
+        const response = await fetch(`${API_BASE_URL}/api/leads/${leadId}/documents`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erro ao enviar documento');
+        }
+
+        const result = await response.json();
+        console.log('Resposta do servidor:', result);
+
+        // Recarregar a lista de documentos
+        await loadDocuments(leadId);
+        
+        // Limpar o formulário
+        form.reset();
+        showNotification('Documento enviado com sucesso', 'success');
+
+    } catch (error) {
+        console.error('Erro ao enviar documento:', error);
+        showNotification(error.message, 'error');
+    } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Enviar Documento';
+    }
+}
+
+function createDocumentElement(doc) {
+    const docElement = document.createElement('div');
+    docElement.className = 'document-item';
+    
+    const date = new Date(doc.createdAt).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    // Determinar o ícone baseado no tipo de arquivo
+    let fileIcon = 'fa-file';
+    const extension = doc.name.split('.').pop().toLowerCase();
+    
+    switch(extension) {
+        case 'pdf':
+            fileIcon = 'fa-file-pdf';
+            break;
+        case 'doc':
+        case 'docx':
+            fileIcon = 'fa-file-word';
+            break;
+        case 'xls':
+        case 'xlsx':
+            fileIcon = 'fa-file-excel';
+            break;
+        case 'jpg':
+        case 'jpeg':
+        case 'png':
+            fileIcon = 'fa-file-image';
+            break;
+    }
+    
+    docElement.innerHTML = `
+        <div class="document-info">
+            <i class="fas ${fileIcon}"></i>
+            <div class="document-details">
+                <strong class="document-name" title="${doc.originalName}">${doc.originalName}</strong>
+                <span class="document-type">${doc.type}</span>
+                <span class="document-date">${date}</span>
+            </div>
+        </div>
+        <div class="document-actions">
+            <button onclick="downloadDocument('${doc._id}')" class="btn-download" title="Download">
+                <i class="fas fa-download"></i>
+            </button>
+            <button onclick="deleteDocument('${doc._id}')" class="btn-delete" title="Excluir">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    return docElement;
+}
+
+// Função para visualizar imagens
+async function previewImage(documentId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leads/${currentLead._id}/documents/${documentId}/download`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao carregar imagem');
+        }
+
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+
+        // Criar modal de preview
+        const previewModal = document.createElement('div');
+        previewModal.className = 'modal preview-modal';
+        previewModal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <img src="${imageUrl}" alt="Preview" style="max-width: 100%; max-height: 80vh;">
+            </div>
+        `;
+
+        document.body.appendChild(previewModal);
+        previewModal.style.display = 'block';
+
+        // Configurar fechamento
+        const closeBtn = previewModal.querySelector('.close');
+        closeBtn.onclick = () => {
+            URL.revokeObjectURL(imageUrl);
+            previewModal.remove();
+        };
+
+        window.onclick = (event) => {
+            if (event.target === previewModal) {
+                URL.revokeObjectURL(imageUrl);
+                previewModal.remove();
+            }
+        };
+
+    } catch (error) {
+        console.error('Erro ao visualizar imagem:', error);
+        showNotification('Erro ao visualizar imagem', 'error');
+    }
+}
+
+// Tornar funções disponíveis globalmente
+window.showDocumentsModal = showDocumentsModal;
+window.downloadDocument = downloadDocument;
+window.previewImage = previewImage;
+
+async function downloadDocument(documentId) {
+    try {
+        console.log('Iniciando download do documento:', documentId);
+        
+        const response = await fetch(`${API_BASE_URL}/api/leads/${currentLead._id}/documents/${documentId}/download`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao baixar documento');
+        }
+
+        // Log dos headers para debug
+        console.log('Headers da resposta:', Object.fromEntries(response.headers.entries()));
+
+        const contentDisposition = response.headers.get('content-disposition');
+        console.log('Content-Disposition:', contentDisposition);
+
+        let fileName = 'documento';
+        
+        if (contentDisposition) {
+            // Primeiro tenta o formato UTF-8
+            const filenameUtf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+            if (filenameUtf8Match) {
+                fileName = decodeURIComponent(filenameUtf8Match[1]);
+            } else {
+                // Tenta o formato padrão
+                const filenameMatch = contentDisposition.match(/filename="([^"]+)"/);
+                if (filenameMatch) {
+                    fileName = filenameMatch[1];
+                }
+            }
+        }
+
+        console.log('Nome do arquivo para download:', fileName);
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(url);
+        a.remove();
+
+        showNotification('Download iniciado', 'success');
+
+    } catch (error) {
+        console.error('Erro ao baixar documento:', error);
+        showNotification('Erro ao baixar documento', 'error');
+    }
+}
+
+// Tornar a função disponível globalmente
+window.downloadDocument = downloadDocument;
+
+async function deleteDocument(documentId) {
+    if (!confirm('Tem certeza que deseja excluir este documento?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/leads/${currentLead._id}/documents/${documentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao excluir documento');
+        }
+
+        showNotification('Documento excluído com sucesso', 'success');
+        await loadDocuments(currentLead._id);
+
+    } catch (error) {
+        console.error('Erro ao excluir documento:', error);
+        showNotification('Erro ao excluir documento', 'error');
+    }
+}
+
+// Tornar função disponível globalmente
+window.deleteDocument = deleteDocument;
 
